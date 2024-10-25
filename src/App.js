@@ -7,9 +7,9 @@ import { routes } from './routes';
 function App() {
   return (
     <Router>
-      <div className="app-container">
+      <div className="app-container flex flex-col min-h-screen">
         <Header />
-        <main className="main-content">
+        <main className="main-content flex-grow">
           <Routes>
             {routes.map((route) => (
               <Route

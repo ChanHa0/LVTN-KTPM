@@ -3,10 +3,25 @@ import "./ProfilePage.css"
 
 const ProfilePage = () => {
     return (
-        <div>
-            <h1>ProfilePage</h1>
+        <form >
+            <label>Enter your name:
+                <input
+                    type="text"
+                    name="username"
 
-        </div>
+
+                />
+            </label>
+            <label>Enter your age:
+                <input
+                    type="number"
+                    name="age"
+
+
+                />
+            </label>
+            <input type="submit" />
+        </form>
     )
 }
 

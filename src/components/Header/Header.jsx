@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Layout, Input, Badge, Avatar, Menu, Dropdown } from 'antd';
 import { UserOutlined, ShoppingCartOutlined, SearchOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
@@ -8,7 +8,6 @@ const { Header: AntHeader } = Layout;
 
 const Header = () => {
     const navigate = useNavigate();
-    const [cartCount, setCartCount] = useState(0);
 
     const menu = (
         <Menu>
@@ -20,9 +19,7 @@ const Header = () => {
         </Menu>
     );
 
-    const updateCartCount = () => {
-        setCartCount(prevCount => prevCount + 1);
-    };
+
 
     return (
         <AntHeader className="header">
@@ -39,8 +36,8 @@ const Header = () => {
                     <Dropdown overlay={menu} placement="bottomRight">
                         <Avatar icon={<UserOutlined />} />
                     </Dropdown>
-                    <Badge count={cartCount}>
-                        <ShoppingCartOutlined className="cart-icon" onClick={updateCartCount} />
+                    <Badge >
+                        <ShoppingCartOutlined className="cart-icon" onClick={""} />
                     </Badge>
                     <span className="cart-count"></span>
                 </div>

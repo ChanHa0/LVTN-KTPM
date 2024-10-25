@@ -1,9 +1,14 @@
-body {
-  margin: 0;
-  box-sizing: border-box;
-  padding: 0;
+html,
+body,
+#root {
+  height: 100%;
 }
 
-html {
-  font-size: 62.5%;
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
 }

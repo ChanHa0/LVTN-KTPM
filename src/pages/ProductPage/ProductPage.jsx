@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Typography, Descriptions, Image, Row, Col, Button, message } from 'antd';
 import { ShoppingCartOutlined } from '@ant-design/icons';
+import './ProductPage.css';
 
 const { Title } = Typography;
 
