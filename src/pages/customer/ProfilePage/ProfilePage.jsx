@@ -1,5 +1,5 @@
 import React from 'react'
-import "./ProfilePage.css"
+import "./ProfilePage.scss"
 
 const ProfilePage = () => {
     return (
@@ -8,16 +8,12 @@ const ProfilePage = () => {
                 <input
                     type="text"
                     name="username"
-
-
                 />
             </label>
             <label>Enter your age:
                 <input
                     type="number"
                     name="age"
-
-
                 />
             </label>
             <input type="submit" />

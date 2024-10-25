@@ -1,18 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { Typography, Row, Col, Button, Card } from 'antd';
 import { StarFilled } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import "./HomePage.css";
+import "./HomePage.scss";
 
 const { Title } = Typography;
 
 const HomePage = () => {
     const danhMucSach = ['Sách Thiếu Nhi', 'Truyện', 'Tiểu Thuyết', 'Sách Giáo Khoa', 'Sách Ngoại Ngữ', 'Sách Ngoại Ngữ'];
-    const [setCartCount] = useState(0);
-
-    const handleAddToCart = () => {
-        setCartCount(prevCount => prevCount + 1);
-    };
 
     return (
         <>
@@ -46,7 +41,7 @@ const HomePage = () => {
                                         1.000.000đ
                                         <span className="discount-text">-5%</span>
                                     </div>
-                                    <Button onClick={handleAddToCart}>Thêm vào giỏ hàng</Button>
+                                    <Button onClick={""}>Thêm vào giỏ hàng</Button>
                                 </Card>
                             </Link>
                         </Col>

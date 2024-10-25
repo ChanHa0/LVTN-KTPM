@@ -1,0 +1,42 @@
+.card {
+    width: 100%;
+    transition: box-shadow 0.3s;
+
+    &:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .ant-card-meta-title {
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+
+    .ant-card-meta-description {
+        color: #f5222d;
+        font-weight: bold;
+    }
+}
+
+@media (max-width: 768px) {
+    .card {
+        .ant-card-meta-title {
+            font-size: 14px;
+        }
+
+        .ant-card-meta-description {
+            font-size: 12px;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        .ant-card-meta-title {
+            font-size: 12px;
+        }
+
+        .ant-card-meta-description {
+            font-size: 10px;
+        }
+    }
+}

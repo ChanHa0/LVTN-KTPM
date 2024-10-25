@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card } from 'antd';
-import './ProductCard.css';
+import './ProductCard.scss';
 
 const ProductCard = ({ title, price, image }) => {
     return (

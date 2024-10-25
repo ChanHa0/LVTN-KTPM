@@ -32,7 +32,30 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
+  }
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex-grow: 1;
+}
+
+@media (max-width: 768px) {
+  .App-header {
+    font-size: calc(8px + 2vmin);
+  }
+}
+
+@media (max-width: 480px) {
+  .App-logo {
+    height: 30vmin;
   }
 }

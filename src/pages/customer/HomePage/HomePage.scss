@@ -1,0 +1,65 @@
+.container {
+    padding: 20px;
+}
+
+.card-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.card {
+    width: 100%;
+}
+
+.product {
+    &-name {
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+
+    &-report {
+        font-size: 12px;
+        color: #888;
+        margin-bottom: 8px;
+    }
+
+    &-price {
+        font-size: 18px;
+        font-weight: bold;
+        color: #f5222d;
+    }
+
+    &-discount {
+        font-size: 12px;
+        color: #52c41a;
+        margin-left: 8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .product {
+        &-name {
+            font-size: 14px;
+        }
+
+        &-price {
+            font-size: 16px;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .product {
+        &-report {
+            font-size: 10px;
+        }
+
+        &-discount {
+            font-size: 10px;
+        }
+    }
+}

@@ -2,7 +2,7 @@ import React from 'react';
 import { Layout, Input, Badge, Avatar, Menu, Dropdown } from 'antd';
 import { UserOutlined, ShoppingCartOutlined, SearchOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import './Header.css';
+import './Header.scss';
 
 const { Header: AntHeader } = Layout;
 

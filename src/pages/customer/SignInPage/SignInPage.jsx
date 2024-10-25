@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './SignInPage.css';
+import './SignInPage.scss';
 
 const SignInPage = () => {
     const handleSubmit = (event) => {
