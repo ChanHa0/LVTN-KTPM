@@ -1,5 +1,4 @@
-const DB = require('../models');
-const Product = DB.Product;
+const { ProductService } = require('../services/ProductService');
 
 const ProductController = {
     async createProduct(req, res) {
@@ -26,22 +25,13 @@ const ProductController = {
     async updateProduct(req, res) {
         try {
             const { id } = req.params;
-            const product = await Product.findByPk(id);
+            const result = await ProductService.updateProduct(id, req.body);
 
-            if (!product) {
-                return res.status(404).json({
-                    status: 'ERR',
-                    message: 'Không tìm thấy sản phẩm'
-                });
+            if (result.status === 'ERR') {
+                return res.status(404).json(result);
             }
 
-            await product.update(req.body);
-
-            res.json({
-                status: 'OK',
-                message: 'Cập nhật sản phẩm thành công',
-                data: product
-            });
+            res.json(result);
         } catch (error) {
             res.status(500).json({
                 status: 'ERR',
@@ -54,21 +44,13 @@ const ProductController = {
     async deleteProduct(req, res) {
         try {
             const { id } = req.params;
-            const product = await Product.findByPk(id);
+            const result = await ProductService.deleteProduct(id);
 
-            if (!product) {
-                return res.status(404).json({
-                    status: 'ERR',
-                    message: 'Không tìm thấy sản phẩm'
-                });
+            if (result.status === 'ERR') {
+                return res.status(404).json(result);
             }
 
-            await product.destroy();
-
-            res.json({
-                status: 'OK',
-                message: 'Xóa sản phẩm thành công'
-            });
+            res.json(result);
         } catch (error) {
             res.status(500).json({
                 status: 'ERR',
@@ -81,37 +63,9 @@ const ProductController = {
     async getAllProducts(req, res) {
         try {
             const { page = 1, limit = 10, sort, filter } = req.query;
-            const offset = (page - 1) * limit;
+            const result = await ProductService.getAllProducts({ page, limit, sort, filter });
 
-            let queryOptions = {
-                offset,
-                limit: parseInt(limit)
-            };
-
-            if (sort) {
-                const [field, order] = sort.split(',');
-                queryOptions.order = [[field, order.toUpperCase()]];
-            }
-
-            if (filter) {
-                const [field, value] = filter.split(',');
-                queryOptions.where = {
-                    [field]: value
-                };
-            }
-
-            const products = await Product.findAndCountAll(queryOptions);
-
-            res.json({
-                status: 'OK',
-                message: 'Lấy danh sách sản phẩm thành công',
-                data: products.rows,
-                pagination: {
-                    total: products.count,
-                    currentPage: parseInt(page),
-                    totalPages: Math.ceil(products.count / limit)
-                }
-            });
+            res.json(result);
         } catch (error) {
             res.status(500).json({
                 status: 'ERR',
@@ -124,20 +78,13 @@ const ProductController = {
     async getProductDetail(req, res) {
         try {
             const { id } = req.params;
-            const product = await Product.findByPk(id);
+            const result = await ProductService.getProductDetail(id);
 
-            if (!product) {
-                return res.status(404).json({
-                    status: 'ERR',
-                    message: 'Không tìm thấy sản phẩm'
-                });
+            if (result.status === 'ERR') {
+                return res.status(404).json(result);
             }
 
-            res.json({
-                status: 'OK',
-                message: 'Lấy chi tiết sản phẩm thành công',
-                data: product
-            });
+            res.json(result);
         } catch (error) {
             res.status(500).json({
                 status: 'ERR',
@@ -146,26 +93,11 @@ const ProductController = {
             });
         }
     },
+
     async getFeaturedBooks(req, res) {
         try {
-            const products = await Product.findAll({
-                where: {
-                    PR_FEATURED: 1
-                },
-                limit: 10,
-                order: [['PR_CREATEDAT', 'DESC']]
-            });
-
-            const formattedProducts = products.map(product => ({
-                ...product.toJSON(),
-                PR_PRICE: Number(product.PR_PRICE) || 0
-            }));
-
-            res.json({
-                status: 'OK',
-                message: 'Lấy danh sách sách nổi bật thành công',
-                data: formattedProducts
-            });
+            const result = await ProductService.getFeaturedBooks();
+            res.json(result);
         } catch (error) {
             console.error('Lỗi getFeaturedBooks:', error);
             res.status(500).json({
@@ -176,5 +108,4 @@ const ProductController = {
         }
     }
 };
-
 module.exports = ProductController;

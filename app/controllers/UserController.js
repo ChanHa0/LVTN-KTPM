@@ -1,9 +1,6 @@
 const { UserService } = require('../services/UserService');
-const { executeQuery } = require('../services/sqlService');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/customer');
-
 
 const UserController = {
     createUser: async (req, res) => {
@@ -11,18 +8,17 @@ const UserController = {
             const { cName, cEmail, cPassword, cPhonenumber, cAddress } = req.body;
 
             // Kiểm tra email đã tồn tại
-            const existingUser = await User.findOne({ where: { cEmail } });
+            const existingUser = await UserService.findUserByEmail(cEmail);
             if (existingUser) {
                 return res.status(400).json({
                     status: 'ERR',
                     message: 'Email đã tồn tại'
                 });
             }
-
             // Mã hóa mật khẩu
             const hashedPassword = await bcrypt.hash(cPassword, 10);
 
-            const user = await UserService.create({
+            const user = await UserService.createUser({
                 cName,
                 cEmail,
                 cPassword: hashedPassword,
@@ -48,7 +44,7 @@ const UserController = {
         try {
             const { cEmail, cPassword } = req.body;
 
-            const user = await User.findOne({ where: { cEmail } });
+            const user = await UserService.findUserByEmail(cEmail);
             if (!user) {
                 return res.status(404).json({
                     status: 'ERR',
@@ -88,7 +84,7 @@ const UserController = {
     },
     updateUser: async (req, res) => {
         try {
-            const user = await User.update(req.body);
+            const user = await UserService.updateUser(req.params.id, req.body);
             res.json(user);
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -96,26 +92,15 @@ const UserController = {
     },
     deleteUser: async (req, res) => {
         try {
-            const checkUser = await executeQuery(`SELECT * FROM Users WHERE id = ${id}`)
-            if (checkUser.length === 0) {
-                resolve({
-                    status: 'ERR',
-                    message: 'Người dùng không tồn tại',
-                })
-            } else {
-                await executeQuery(`DELETE FROM Users WHERE id = ${id}`)
-                resolve({
-                    status: 'OK',
-                    message: 'Xóa người dùng thành công'
-                })
-            }
+            const result = await UserService.deleteUser(req.params.id);
+            res.json(result);
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
     },
     getAllUsers: async (req, res) => {
         try {
-            const users = await User.findAll();
+            const users = await UserService.getAllUsers();
             res.json(users);
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -123,7 +108,7 @@ const UserController = {
     },
     getdetailUser: async (req, res) => {
         try {
-            const user = await User.findByPk(req.params.id);
+            const user = await UserService.getUserDetail(req.params.id);
             res.json(user);
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -131,7 +116,7 @@ const UserController = {
     },
     refreshToken: async (req, res) => {
         try {
-            const token = req.headers.token.split('')[1];
+            const token = req.headers.token.split(' ')[1];
             res.json(token);
         } catch (error) {
             res.status(500).json({ message: error.message });

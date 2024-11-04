@@ -15,10 +15,19 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
 app.use(express.json());
 
 routes(app);
+
+// Middleware xử lý lỗi
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({
+        status: 'ERR',
+        message: 'Lỗi server',
+        error: err.message
+    });
+});
 
 const PORT = process.env.PORT || 5000;
 
@@ -30,7 +39,7 @@ async function startServer() {
             console.log(`Server đang chạy trên cổng ${PORT}`);
         });
     } catch (error) {
-        console.error('Không thể kết nối tới database:', error);
+        console.error('Không thể kết nối tới database:', error.message);
     }
 }
 
