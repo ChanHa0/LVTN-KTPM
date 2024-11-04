@@ -1,23 +1,23 @@
-import DashboardPage from '../pages/admin/DashboardPage/DashboardPage';
-import ProductsPage from '../pages/admin/ProductsPage/ProductsPage';
-import OrdersPage from '../pages/admin/OrdersPage/OrdersPage';
-import UsersPage from '../pages/admin/UsersPage/UsersPage';
+import AdminDashboard from '../pages/admin/AdminDashboard';
+import AdminProducts from '../pages/admin/AdminProducts';
+import AdminOrders from '../pages/admin/AdminOrders';
+import AdminUsers from '../pages/admin/AdminUsers';
 import AdminLayout from '../layouts/AdminLayout';
 export const adminRoutes = [
     {
         path: '/admin',
-        element: <AdminLayout><DashboardPage /></AdminLayout>
+        element: <AdminLayout><AdminDashboard /></AdminLayout>
     },
     {
-        path: '/admin/sach',
-        element: <AdminLayout><ProductsPage /></AdminLayout>
+        path: '/admin/quan-li-san-pham',
+        element: <AdminLayout><AdminProducts /></AdminLayout>
     },
     {
-        path: '/admin/dathang',
-        element: <AdminLayout><OrdersPage /></AdminLayout>
+        path: '/admin/quan-li-don-hang',
+        element: <AdminLayout><AdminOrders /></AdminLayout>
     },
     {
-        path: '/admin/khachhang',
-        element: <AdminLayout><UsersPage /></AdminLayout>
+        path: '/admin/quan-li-tai-khoan',
+        element: <AdminLayout><AdminUsers /></AdminLayout>
     }
 ];

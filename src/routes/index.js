@@ -1,4 +1,4 @@
-import { customerRoutes } from './customerRoutes';
+import { userRoutes } from './userRoutes';
 import { adminRoutes } from './adminRoutes';
 
-export const routes = [...customerRoutes, ...adminRoutes];
+export const routes = [...userRoutes, ...adminRoutes];
