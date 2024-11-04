@@ -36,6 +36,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: true,
       field: 'C_ADDRESS'
+    },
+    cRole: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      field: 'C_ROLE'
     }
   }, {
     sequelize,

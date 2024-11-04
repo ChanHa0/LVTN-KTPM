@@ -1,53 +1,53 @@
 const Sequelize = require('sequelize');
-module.exports = function (sequelize, DataTypes) {
-  return sequelize.define('Book', {
-    bId: {
+module.exports = function(sequelize, DataTypes) {
+  return sequelize.define('Product', {
+    prId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      field: 'B_ID'
+      field: 'PR_ID'
     },
-    bTitle: {
+    prTitle: {
       type: DataTypes.STRING(100),
       allowNull: true,
-      field: 'B_TITLE'
+      field: 'PR_TITLE'
     },
-    bAuthor: {
+    prAuthor: {
       type: DataTypes.STRING(100),
       allowNull: true,
-      field: 'B_AUTHOR'
+      field: 'PR_AUTHOR'
     },
-    bPublisher: {
+    prPublisher: {
       type: DataTypes.STRING(100),
       allowNull: true,
-      field: 'B_PUBLISHER'
+      field: 'PR_PUBLISHER'
     },
-    bYearofpublication: {
+    prYearofpublication: {
       type: DataTypes.DATE,
       allowNull: true,
-      field: 'B_YEAROFPUBLICATION'
+      field: 'PR_YEAROFPUBLICATION'
     },
-    bStockquanlity: {
+    prStockquanlity: {
       type: DataTypes.INTEGER,
       allowNull: true,
-      field: 'B_STOCKQUANLITY'
+      field: 'PR_STOCKQUANLITY'
     },
-    bPrice: {
-      type: DataTypes.DECIMAL(10, 2),
+    prPrice: {
+      type: DataTypes.DECIMAL(10,2),
       allowNull: true,
-      field: 'B_PRICE'
+      field: 'PR_PRICE'
     }
   }, {
     sequelize,
-    tableName: 'BOOK',
+    tableName: 'PRODUCT',
     schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PK_BOOK",
+        name: "PK_PRODUCT",
         unique: true,
         fields: [
-          { name: "B_ID" },
+          { name: "PR_ID" },
         ]
       },
     ]

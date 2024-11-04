@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Cartdetailiteam', {
+  return sequelize.define('Cartdetail', {
     scId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -11,55 +11,55 @@ module.exports = function(sequelize, DataTypes) {
       },
       field: 'SC_ID'
     },
-    bId: {
+    prId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       references: {
-        model: 'BOOK',
-        key: 'B_ID'
+        model: 'PRODUCT',
+        key: 'PR_ID'
       },
-      field: 'B_ID'
+      field: 'PR_ID'
     },
-    cdiId: {
+    cdId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      field: 'CDI_ID'
+      field: 'CD_ID'
     },
-    cdiQuantity: {
+    cdQuantity: {
       type: DataTypes.INTEGER,
       allowNull: true,
-      field: 'CDI_QUANTITY'
+      field: 'CD_QUANTITY'
     },
-    cdiTotalprice: {
+    cdTotalprice: {
       type: DataTypes.DECIMAL(10,2),
       allowNull: true,
-      field: 'CDI_TOTALPRICE'
+      field: 'CD_TOTALPRICE'
     }
   }, {
     sequelize,
-    tableName: 'CARTDETAILITEAM',
+    tableName: 'CARTDETAIL',
     schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "CARTDETAILITEAM_FK",
-        fields: [
-          { name: "B_ID" },
-        ]
-      },
-      {
-        name: "CARTDETAILITEAM2_FK",
+        name: "CARTDETAIL_FK",
         fields: [
           { name: "SC_ID" },
         ]
       },
       {
-        name: "PK_CARTDETAILITEAM",
+        name: "CARTDETAIL2_FK",
+        fields: [
+          { name: "PR_ID" },
+        ]
+      },
+      {
+        name: "PK_CARTDETAIL",
         unique: true,
         fields: [
           { name: "SC_ID" },
-          { name: "B_ID" },
+          { name: "PR_ID" },
         ]
       },
     ]

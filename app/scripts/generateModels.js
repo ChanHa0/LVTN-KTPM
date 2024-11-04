@@ -10,7 +10,7 @@ const auto = new SequelizeAuto(sequelize, null, null, {
     additional: {
         timestamps: false
     },
-    tables: ['ADMIN', 'BOOK', 'BOOKCATEGORY', 'CARTDETAILITEAM', 'CATEGORY', 'CUSTOMER', 'MANAGEBOOK', 'MANAGECUSTOMER', 'MANAGEORDER', 'ORDER', 'ORDERDETAIL', 'PAYMENT', 'REVIEW', 'SHOPPINGCART'] // Thay thế bằng tên các bảng của bạn
+    tables: ['ADMIN', 'PRODUCT', 'PRODUCTCATEGORY', 'CARTDETAIL', 'CATEGORY', 'CUSTOMER', 'MANAGEPRODUCT', 'MANAGECUSTOMER', 'MANAGEORDER', 'ORDER', 'ORDERDETAIL', 'PAYMENT', 'REVIEW', 'SHOPPINGCART']
 });
 
 auto.run().then(() => {

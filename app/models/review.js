@@ -7,14 +7,14 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true,
       field: 'R_ID'
     },
-    bId: {
+    prId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'BOOK',
-        key: 'B_ID'
+        model: 'PRODUCT',
+        key: 'PR_ID'
       },
-      field: 'B_ID'
+      field: 'PR_ID'
     },
     cId: {
       type: DataTypes.INTEGER,
@@ -57,12 +57,6 @@ module.exports = function(sequelize, DataTypes) {
         name: "RELATIONSHIP_2_FK",
         fields: [
           { name: "C_ID" },
-        ]
-      },
-      {
-        name: "RELATIONSHIP_3_FK",
-        fields: [
-          { name: "B_ID" },
         ]
       },
     ]

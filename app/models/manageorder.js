@@ -35,13 +35,13 @@ module.exports = function(sequelize, DataTypes) {
       {
         name: "MANAGEORDER_FK",
         fields: [
-          { name: "O_ID" },
+          { name: "A_ID" },
         ]
       },
       {
         name: "MANAGEORDER2_FK",
         fields: [
-          { name: "A_ID" },
+          { name: "O_ID" },
         ]
       },
       {

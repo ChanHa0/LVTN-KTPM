@@ -1,55 +1,55 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Managebook', {
-    aId: {
+  return sequelize.define('Productcategory', {
+    prId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       references: {
-        model: 'ADMIN',
-        key: 'A_ID'
+        model: 'PRODUCT',
+        key: 'PR_ID'
       },
-      field: 'A_ID'
+      field: 'PR_ID'
     },
-    bId: {
+    cgCategoryid: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       references: {
-        model: 'BOOK',
-        key: 'B_ID'
+        model: 'CATEGORY',
+        key: 'CG_CATEGORYID_'
       },
-      field: 'B_ID'
+      field: 'CG_CATEGORYID_'
     },
-    mbId: {
+    prcId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      field: 'MB_ID'
+      field: 'PRC_ID'
     }
   }, {
     sequelize,
-    tableName: 'MANAGEBOOK',
+    tableName: 'PRODUCTCATEGORY',
     schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "MANAGEBOOK_FK",
-        fields: [
-          { name: "B_ID" },
-        ]
-      },
-      {
-        name: "MANAGEBOOK2_FK",
-        fields: [
-          { name: "A_ID" },
-        ]
-      },
-      {
-        name: "PK_MANAGEBOOK",
+        name: "PK_PRODUCTCATEGORY",
         unique: true,
         fields: [
-          { name: "A_ID" },
-          { name: "B_ID" },
+          { name: "PR_ID" },
+          { name: "CG_CATEGORYID_" },
+        ]
+      },
+      {
+        name: "PRODUCTCATEGORY_FK",
+        fields: [
+          { name: "PR_ID" },
+        ]
+      },
+      {
+        name: "PRODUCTCATEGORY2_FK",
+        fields: [
+          { name: "CG_CATEGORYID_" },
         ]
       },
     ]

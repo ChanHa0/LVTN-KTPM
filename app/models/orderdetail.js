@@ -1,15 +1,15 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('Orderdetail', {
-    bId: {
+    prId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       references: {
-        model: 'BOOK',
-        key: 'B_ID'
+        model: 'PRODUCT',
+        key: 'PR_ID'
       },
-      field: 'B_ID'
+      field: 'PR_ID'
     },
     oId: {
       type: DataTypes.INTEGER,
@@ -43,22 +43,16 @@ module.exports = function(sequelize, DataTypes) {
     timestamps: false,
     indexes: [
       {
-        name: "ORDERDETAIL_FK",
-        fields: [
-          { name: "O_ID" },
-        ]
-      },
-      {
         name: "ORDERDETAIL2_FK",
         fields: [
-          { name: "B_ID" },
+          { name: "O_ID" },
         ]
       },
       {
         name: "PK_ORDERDETAIL",
         unique: true,
         fields: [
-          { name: "B_ID" },
+          { name: "PR_ID" },
           { name: "O_ID" },
         ]
       },
