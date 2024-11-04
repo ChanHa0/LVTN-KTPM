@@ -2,8 +2,25 @@ import React from 'react';
 import Sidebar from '../../components/common/CategorySidebar';
 import HomeCarousel from '../../components/common/HomeCarousel';
 import ProductCard from '../../components/common/ProductCard';
+import { useEffect } from 'react';
+import axiosClient from '../../services/api';
 
 const HomePage = () => {
+    useEffect(() => {
+        const checkConnection = async () => {
+            try {
+                const response = await axiosClient.get('/check-connection');  // Bỏ /api vì đã có trong baseURL
+                if (response.status === 'OK') {
+                    console.log('Kết nối thành công với server');
+                }
+            } catch (error) {
+                console.error('Lỗi kết nối:', error);
+            }
+        };
+
+        checkConnection();
+    }, []);
+
     const discountBooks = [...Array(5)].map((_, index) => ({
         id: index,
         title: `Sách giảm giá ${index + 1}`,

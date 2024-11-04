@@ -1,25 +1,30 @@
-import React, { useState } from 'react';
-import { FaSearch, FaEdit, FaTrash } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaSearch, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import AdminNavbar from '../../components/admin/AdminNavbar';
-import { userService } from '../../services/userApi';
+import userService from '../../services/userService';
 
 const AdminUsers = () => {
-    const [users, setUsers] = useState([
-        {
-            id: 1,
-            name: 'Nguyễn Văn A',
-            email: 'nguyenvana@gmail.com',
-            phone: '0123456789',
-            totalOrders: 5,
-            totalSpent: 2500000,
-            status: 'active'
-        },
-        // Thêm người dùng mẫu khác
-    ]);
-    const handleCreateUser = async (userData) => {
+    const [users, setUsers] = useState([]);
+    const [newUser, setNewUser] = useState({ name: '', email: '', password: '' });
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const response = await userService.getAllUsers();
+                setUsers(response.data);
+            } catch (error) {
+                console.error('Lỗi khi lấy danh sách người dùng:', error);
+            }
+        };
+
+        fetchUsers();
+    }, []);
+
+    const handleCreateUser = async () => {
         try {
-            const newUser = await userService.createUser(userData);
-            setUsers([...users, newUser]);
+            const createdUser = await userService.createUser(newUser);
+            setUsers([...users, createdUser]);
+            setNewUser({ name: '', email: '', password: '' }); // Reset form
         } catch (error) {
             console.error('Lỗi khi tạo người dùng:', error);
         }
@@ -34,6 +39,9 @@ const AdminUsers = () => {
         }
     };
 
+    const handleEditUser = (userId) => {
+        console.log('Chỉnh sửa người dùng:', userId);
+    };
 
     const statusColors = {
         active: 'bg-green-100 text-green-800',
@@ -47,12 +55,53 @@ const AdminUsers = () => {
         blocked: 'Đã khóa'
     };
 
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setNewUser({ ...newUser, [name]: value });
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             <AdminNavbar />
 
             <div className="max-w-7xl mx-auto px-4 py-8">
-                <h1 className="text-2xl font-bold text-gray-800 mb-6">Quản lý khách hàng</h1>
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold text-gray-800">Quản lý khách hàng</h1>
+                    <button
+                        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                        onClick={handleCreateUser}
+                    >
+                        <FaPlus /> Thêm người dùng
+                    </button>
+                </div>
+
+                {/* Form để thêm người dùng mới */}
+                <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Tên người dùng"
+                        value={newUser.name}
+                        onChange={handleInputChange}
+                        className="w-full mb-2 p-2 border rounded-lg"
+                    />
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Email"
+                        value={newUser.email}
+                        onChange={handleInputChange}
+                        className="w-full mb-2 p-2 border rounded-lg"
+                    />
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Mật khẩu"
+                        value={newUser.password}
+                        onChange={handleInputChange}
+                        className="w-full mb-2 p-2 border rounded-lg"
+                    />
+                </div>
 
                 {/* Search & Filter */}
                 <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
@@ -123,10 +172,16 @@ const AdminUsers = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button className="text-blue-600 hover:text-blue-900 mr-3">
+                                        <button
+                                            className="text-blue-600 hover:text-blue-900 mr-3"
+                                            onClick={() => handleEditUser(user.id)}
+                                        >
                                             <FaEdit />
                                         </button>
-                                        <button className="text-red-600 hover:text-red-900">
+                                        <button
+                                            className="text-red-600 hover:text-red-900"
+                                            onClick={() => handleDeleteUser(user.id)}
+                                        >
                                             <FaTrash />
                                         </button>
                                     </td>
@@ -141,5 +196,3 @@ const AdminUsers = () => {
 };
 
 export default AdminUsers;
-
-

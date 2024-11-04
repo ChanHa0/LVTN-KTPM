@@ -6,9 +6,9 @@ const AdminNavbar = () => {
 
     const navItems = [
         { path: '/admin', icon: <FaChartBar />, label: 'Thống kê' },
-        { path: '/admin/sach', icon: <FaBook />, label: 'Quản lý sách' },
-        { path: '/admin/dathang', icon: <FaShoppingCart />, label: 'Đơn hàng' },
-        { path: '/admin/khachhang', icon: <FaUsers />, label: 'Khách hàng' },
+        { path: '/admin/quan-li-san-pham', icon: <FaBook />, label: 'Quản lý sách' },
+        { path: '/admin/quan-li-don-hang', icon: <FaShoppingCart />, label: 'Đơn hàng' },
+        { path: '/admin/quan-li-tai-khoan', icon: <FaUsers />, label: 'Khách hàng' },
     ];
 
     return (

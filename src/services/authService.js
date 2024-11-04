@@ -1,6 +1,6 @@
-import axiosClient from '../utils/api';
+import axiosClient from '../services/api';
 
-export const authService = {
+const authService = {
     register: async (userData) => {
         try {
             const response = await axiosClient.post('/users/register', userData);
@@ -26,3 +26,5 @@ export const authService = {
         localStorage.removeItem('token');
     }
 };
+
+export default authService;
