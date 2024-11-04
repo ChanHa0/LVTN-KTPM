@@ -1,5 +1,5 @@
 const sql = require('mssql');
-const config = require('../config/database');
+const config = require('../config/connectDB');
 
 const connectToDatabase = async () => {
     try {

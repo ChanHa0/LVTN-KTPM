@@ -3,11 +3,11 @@ const ProductController = require('../controllers/ProductController');
 const authMiddleware = require('../middlewares/authMiddleware');
 
 const router = express.Router();
-router.post('/create', authMiddleware, ProductController.createProduct);
-router.put('/update/:id', authMiddleware, ProductController.updateProduct);
-router.delete('/delete/:id', authMiddleware, ProductController.deleteProduct);
-router.get('/get-all-products', ProductController.getAllProducts);
-router.get('/get-product-detail/:id', ProductController.getProductDetail);
-router.get('/get-featured-books', ProductController.getFeaturedBooks);
+router.post('/', authMiddleware, ProductController.createProduct);
+router.patch('/:id', authMiddleware, ProductController.updateProduct);
+router.delete('/:id', authMiddleware, ProductController.deleteProduct);
+router.get('/all', ProductController.getAllProducts);
+router.get('/detail/:id', ProductController.getProductDetail);
+router.get('/featured', ProductController.getFeaturedBooks);
 
 module.exports = router;
