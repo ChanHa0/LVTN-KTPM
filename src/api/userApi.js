@@ -1,10 +1,9 @@
-import axios from 'axios';
-const API_URL = 'http://localhost:5000/api/users';
+import axiosClient from './axiosClient';
 
 const userService = {
     createUser: async (userData) => {
         try {
-            const response = await axios.post(API_URL, userData);
+            const response = await axiosClient.post('/api/user/register', userData);
             return response.data;
         } catch (error) {
             console.error('Error creating user:', error);
@@ -14,7 +13,7 @@ const userService = {
 
     updateUser: async (id, userData) => {
         try {
-            const response = await axios.put(`${API_URL}/${id}`, userData);
+            const response = await axiosClient.patch(`/api/user/${id}`, userData);
             return response.data;
         } catch (error) {
             console.error('Error updating user:', error);
@@ -24,7 +23,7 @@ const userService = {
 
     deleteUser: async (id) => {
         try {
-            const response = await axios.delete(`${API_URL}/${id}`);
+            const response = await axiosClient.delete(`/api/user/${id}`);
             return response.data;
         } catch (error) {
             console.error('Error deleting user:', error);
@@ -34,19 +33,10 @@ const userService = {
 
     getAllUsers: async () => {
         try {
-            const response = await axios.get(API_URL);
+            const response = await axiosClient.get('/api/user');
             return response.data;
         } catch (error) {
             console.error('Error fetching users:', error);
-            throw error;
-        }
-    },
-    getUserDetail: async (id) => {
-        try {
-            const response = await axios.get(`${API_URL}/${id}`);
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching user detail:', error);
             throw error;
         }
     },

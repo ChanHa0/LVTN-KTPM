@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const CheckoutPage = () => {
+const Payment = () => {
     const [formData, setFormData] = useState({
         fullName: '',
         phone: '',
@@ -203,4 +203,4 @@ const CheckoutPage = () => {
     );
 };
 
-export default CheckoutPage;
+export default Payment;

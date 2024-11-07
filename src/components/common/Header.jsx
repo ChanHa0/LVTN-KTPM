@@ -72,13 +72,13 @@ const Header = () => {
                                         }`}
                                 >
                                     <a
-                                        href="/dang-ky"
+                                        href="/register"
                                         className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-500 transition-colors"
                                     >
                                         Đăng ký
                                     </a>
                                     <a
-                                        href="/dang-nhap"
+                                        href="/login"
                                         className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-500 transition-colors"
                                     >
                                         Đăng nhập
@@ -87,7 +87,7 @@ const Header = () => {
                             </div>
 
                             <div className="relative">
-                                <a href="/gio-hang" className="p-3 hover:bg-gray-100 rounded-full transition-colors">
+                                <a href="/order" className="p-3 hover:bg-gray-100 rounded-full transition-colors">
                                     <FaShoppingCart className="text-blue-500" size={22} />
                                     {cartCount > 0 && (
                                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">

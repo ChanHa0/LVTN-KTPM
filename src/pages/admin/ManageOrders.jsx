@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FaSearch, FaEye } from 'react-icons/fa';
 import AdminNavbar from '../../components/admin/AdminNavbar';
 
-const OrdersPage = () => {
+const ManageOrders = () => {
     const [orders] = useState([
         {
             id: "DH001",
@@ -122,4 +122,4 @@ const OrdersPage = () => {
     );
 };
 
-export default OrdersPage;
+export default ManageOrders;

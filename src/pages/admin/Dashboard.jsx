@@ -3,7 +3,7 @@ import { FaBook, FaShoppingCart, FaUsers, FaDollarSign, FaArrowUp, FaArrowDown }
 import AdminNavbar from '../../components/admin/AdminNavbar';
 // import { RevenueChart, TopSellingBooks } from './components';
 
-const DashboardPage = () => {
+const Dashboard = () => {
     const stats = [
         {
             title: 'Tổng doanh thu',
@@ -82,4 +82,4 @@ const DashboardPage = () => {
     );
 };
 
-export default DashboardPage;
+export default Dashboard;

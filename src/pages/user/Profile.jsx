@@ -1,6 +1,6 @@
 import React from 'react'
 
-const ProfilePage = () => {
+const Profile = () => {
     return (
         <form className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
             <div className="mb-4">
@@ -31,4 +31,4 @@ const ProfilePage = () => {
     )
 }
 
-export default ProfilePage
+export default Profile;

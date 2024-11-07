@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaShoppingCart } from 'react-icons/fa';
 
-const ProductPage = ({ updateCartCount }) => {
+const ProductDetail = ({ updateCartCount }) => {
     const [cartCount, setCartCount] = useState(0);
 
     const handleAddToCart = () => {
@@ -70,4 +70,4 @@ const ProductPage = ({ updateCartCount }) => {
     );
 }
 
-export default ProductPage;
+export default ProductDetail;

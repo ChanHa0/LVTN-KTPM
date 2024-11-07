@@ -1,13 +1,16 @@
 import Home from "../pages/user/Home";
-import ProductDetail from "../pages/user/ProductDetail";
 import Register from "../pages/user/Register";
 import Login from "../pages/user/Login";
-import UserProfile from "../pages/user/UserProfile";
-import ShoppingCart from "../pages/user/ShoppingCart";
-import Checkout from "../pages/user/Checkout";
+import Profile from "../pages/user/Profile";
+import Product from "../pages/user/ProductDetail";
+import ProductDetail from "../pages/user/Product";
+import Search from "../pages/user/Search";
+import Order from "../pages/user/Order";
+import OrderDetail from "../pages/user/OrderDetail";
+import Payment from "../pages/user/Payment";
+import NotFound from "../pages/user/NotFound";
 import UserLayout from "../layouts/UserLayout";
 import AuthLayout from "../layouts/AuthLayout";
-import NotFound from "../pages/user/NotFound";
 
 export const userRoutes = [
     {
@@ -15,32 +18,43 @@ export const userRoutes = [
         element: <UserLayout><Home /></UserLayout>
     },
     {
-        path: '/san-pham-chi-tiet',
-        element: <UserLayout><ProductDetail /></UserLayout>
-    },
-    {
-        path: '/dang-ky',
+        path: '/register',
         element: <AuthLayout><Register /></AuthLayout>
     },
     {
-        path: '/dang-nhap',
+        path: '/login',
         element: <AuthLayout><Login /></AuthLayout>
     },
     {
-        path: '/thong-tin-ca-nhan',
-        element: <UserLayout><UserProfile /></UserLayout>
+        path: '/profile',
+        element: <UserLayout><Profile /></UserLayout>
     },
     {
-        path: '/gio-hang',
-        element: <UserLayout><ShoppingCart /></UserLayout>
+        path: '/product',
+        element: <UserLayout><Product /></UserLayout>
     },
     {
-        path: '/thanh-toan',
-        element: <UserLayout><Checkout /></UserLayout>
+        path: '/product-detail',
+        element: <UserLayout><ProductDetail /></UserLayout>
+    },
+    {
+        path: '/search',
+        element: <UserLayout><Search /></UserLayout>
+    },
+    {
+        path: '/order',
+        element: <UserLayout><Order /></UserLayout>
+    },
+    {
+        path: '/order-detail',
+        element: <UserLayout><OrderDetail /></UserLayout>
+    },
+    {
+        path: '/payment',
+        element: <UserLayout><Payment /></UserLayout>
     },
     {
         path: '*',
         element: <NotFound />
-    }
-
+    },
 ];

@@ -1,32 +1,49 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import authService from '../../services/authService';
+import authApi from '../../api/authApi';
 
-const SignInPage = () => {
+const Login = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: '',
         password: ''
     });
     const [error, setError] = useState('');
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await authService.login(formData);
-            if (response.status === 'OK') {
-                navigate('/');
-            }
-        } catch (error) {
-            setError(error.response?.data?.message || 'Đăng nhập thất bại');
-        }
-    };
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [e.target.id]: e.target.value
         });
+        setError('');
+    };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            const response = await authApi.login({
+                email: formData.email,
+                password: formData.password
+            });
+
+            if (response.status === 'OK') {
+                // Kiểm tra role của người dùng
+                if (response.data.role === 'admin') {
+                    navigate('/admin');
+                } else {
+                    navigate('/');
+                }
+            } else {
+                setError(response.message || 'Đăng nhập thất bại');
+            }
+        } catch (error) {
+            setError(error.message || 'Lỗi hệ thống, vui lòng thử lại sau');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -52,12 +69,12 @@ const SignInPage = () => {
                             </label>
                             <div className="mt-1">
                                 <input
+                                    id="email"
                                     type="email"
-                                    name="email"
+                                    required
                                     value={formData.email}
                                     onChange={handleChange}
-                                    required
-                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
                         </div>
@@ -68,12 +85,12 @@ const SignInPage = () => {
                             </label>
                             <div className="mt-1">
                                 <input
+                                    id="password"
                                     type="password"
-                                    name="password"
+                                    required
                                     value={formData.password}
                                     onChange={handleChange}
-                                    required
-                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
                         </div>
@@ -81,9 +98,23 @@ const SignInPage = () => {
                         <div>
                             <button
                                 type="submit"
-                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                disabled={loading}
+                                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
+                                    ${loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}
+                                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
                             >
-                                Đăng nhập
+                                {loading ? 'Đang xử lý...' : 'Đăng nhập'}
+                            </button>
+                        </div>
+
+                        <div className="text-sm text-center">
+                            <span className="text-gray-600">Chưa có tài khoản? </span>
+                            <button
+                                type="button"
+                                onClick={() => navigate('/dang-ky')}
+                                className="font-medium text-blue-600 hover:text-blue-500"
+                            >
+                                Đăng ký
                             </button>
                         </div>
                     </form>
@@ -93,4 +124,4 @@ const SignInPage = () => {
     );
 };
 
-export default SignInPage;
+export default Login;
