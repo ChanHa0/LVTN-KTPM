@@ -2,19 +2,20 @@ const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('Payment', {
     pId: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       field: 'P_ID'
     },
-    cId: {
+    uId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'CUSTOMER',
-        key: 'C_ID'
+        model: 'USER',
+        key: 'U_ID'
       },
-      field: 'C_ID'
+      field: 'U_ID'
     },
     oId: {
       type: DataTypes.INTEGER,
@@ -26,12 +27,12 @@ module.exports = function(sequelize, DataTypes) {
       field: 'O_ID'
     },
     pMethod: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(255),
       allowNull: true,
       field: 'P_METHOD'
     },
     pStatus: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.STRING(255),
       allowNull: true,
       field: 'P_STATUS'
     }
@@ -51,7 +52,7 @@ module.exports = function(sequelize, DataTypes) {
       {
         name: "RELATIONSHIP_5_FK",
         fields: [
-          { name: "C_ID" },
+          { name: "U_ID" },
         ]
       },
       {

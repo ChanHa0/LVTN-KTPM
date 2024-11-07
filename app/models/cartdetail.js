@@ -1,15 +1,15 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('Cartdetail', {
-    scId: {
+    cId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       references: {
-        model: 'SHOPPINGCART',
-        key: 'SC_ID'
+        model: 'CART',
+        key: 'C_ID'
       },
-      field: 'SC_ID'
+      field: 'C_ID'
     },
     prId: {
       type: DataTypes.INTEGER,
@@ -23,7 +23,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     cdId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       field: 'CD_ID'
     },
     cdQuantity: {
@@ -45,7 +45,7 @@ module.exports = function(sequelize, DataTypes) {
       {
         name: "CARTDETAIL_FK",
         fields: [
-          { name: "SC_ID" },
+          { name: "C_ID" },
         ]
       },
       {
@@ -58,7 +58,7 @@ module.exports = function(sequelize, DataTypes) {
         name: "PK_CARTDETAIL",
         unique: true,
         fields: [
-          { name: "SC_ID" },
+          { name: "C_ID" },
           { name: "PR_ID" },
         ]
       },

@@ -1,169 +1,186 @@
-const bcrypt = require('bcrypt');
-const { generalAccessToken, generalRefreshToken } = require('./JwtService');
-const DB = require('../models');
-const User = DB.User;
+const { User } = require('../models');
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken');
 
-const createUser = async (userData) => {
-    try {
-        const { cName, cEmail, cPassword, cPhonenumber, cAddress } = userData;
+const UserService = {
+    registerUser: async (userData) => {
+        let { uName, uEmail, uPassword, uAddress, uPhone, uIsadmin } = userData;
+        try {
+            // Kiểm tra xem email đã tồn tại hay chưa
+            const existingUser = await UserService.findUserByEmail(uEmail);
+            if (existingUser) {
+                return { status: 'ERR', message: 'Email đã tồn tại' };
+            }
+            // Hash password trước khi lưu
+            if (uPassword) {
+                uPassword = await UserService.hashPassword(uPassword);
+            }
+            // Tạo người dùng mới
+            const newUser = await User.create({
+                uName,
+                uPassword,
+                uEmail,
+                uAddress,
+                uPhone,
+                uIsadmin
+            });
+            // Đăng ký thành công
+            return { status: 'OK', message: 'Đăng ký thành công', data: newUser };
 
-        // Validate input
-        if (!cName || !cEmail || !cPassword) {
-            return {
-                status: 'ERR',
-                message: 'Thiếu thông tin cần thiết'
-            };
+        } catch (error) {
+            return { status: 'ERR', message: 'Lỗi đăng ký', error: error.message };
         }
+    },
 
-        // Check if email already exists
-        const existingUser = await User.findOne({ where: { cEmail } });
-        if (existingUser) {
+    loginUser: async (userData) => {
+        const { uEmail, uPassword } = userData;
+        try {
+            // Tìm người dùng theo email
+            const user = await User.findOne({
+                where: { uEmail: userData.uEmail }
+            });
+            // Kiểm tra xem người dùng có tồn tại không
+            if (!user) {
+                return { status: 'ERR', message: 'Email không tồn tại' };
+            }
+            // Kiểm tra xem user có password không
+            if (!user.uPassword) {
+                // Nếu user chưa có password (ví dụ: đăng nhập bằng Google)
+                return {
+                    status: 'OK',
+                    message: 'Đăng nhập thành công',
+                    data: {
+                        user: {
+                            id: user.uId,
+                            name: user.uName,
+                            email: user.uEmail,
+                            role: user.uIsadmin
+                        }
+                    }
+                };
+            }
+            // Nếu có password, thực hiện so sánh
+            if (uPassword && user.uPassword) {
+                const isValidPassword = await bcrypt.compare(uPassword, user.uPassword);
+                if (!isValidPassword) {
+                    return { status: 'ERR', message: 'Mật khẩu không chính xác' };
+                }
+            } else {
+                return { status: 'ERR', message: 'Vui lòng nhập mật khẩu' };
+            }
+            // Tạo JWT token
+            const token = jwt.sign(
+                { id: user.uId, email: user.uEmail, role: user.uIsadmin },
+                process.env.JWT_SECRET || 'your-secret-key',
+                { expiresIn: '24h' }
+            );
+            // Đăng nhập thành công
             return {
-                status: 'ERR',
-                message: 'Email đã tồn tại'
+                status: 'OK',
+                message: 'Đăng nhập thành công',
+                data: {
+                    user: {
+                        id: user.uId,
+                        name: user.uName,
+                        email: user.uEmail,
+                        role: user.uIsadmin
+                    },
+                    token
+                }
             };
+
+        } catch (error) {
+            return { status: 'ERR', message: 'Lỗi đăng nhập', error: error.message };
         }
+    },
 
-        // Hash password
-        const hashedPassword = await bcrypt.hash(cPassword, 10);
+    updateUser: async (id, userData) => {
+        try {
+            // Tìm người dùng theo id
+            const user = await User.findByPk(id);
+            if (!user) {
+                return { status: 'ERR', message: 'Không tìm thấy người dùng' };
+            }
+            // Nếu có password mới thì hash password
+            if (userData.uPassword) {
+                userData.uPassword = await bcrypt.hash(userData.uPassword, 10);
+            }
+            // Cập nhật thông tin người dùng
+            await user.update(userData);
+            // Cập nhật thành công
+            return { status: 'OK', message: 'Cập nhật thông tin thành công', data: user };
 
-        // Create user
-        const user = await User.create({
-            cName,
-            cEmail,
-            cPassword: hashedPassword,
-            cPhonenumber,
-            cAddress,
-            cRole: 'user'
-        });
-
-        return {
-            status: 'OK',
-            message: 'Tạo tài khoản thành công',
-            data: user
+        } catch (error) {
+            return { status: 'ERR', message: 'Lỗi cập nhật thông tin', error: error.message };
         };
-    } catch (error) {
-        throw new Error(error.message);
+    },
+
+    deleteUser: async (id) => {
+        try {
+            // Tìm người dùng theo id
+            const user = await User.findByPk(id);
+            if (!user) {
+                return { status: 'ERR', message: 'Không tìm thấy người dùng' };
+            }
+            // Xóa người dùng
+            await user.destroy();
+            return { status: 'OK', message: 'Xóa người dùng thành công' };
+
+        } catch (error) {
+            return { status: 'ERR', message: 'Lỗi xóa người dùng', error: error.message };
+        };
+    },
+
+    getAllUsers: async (query) => {
+        try {
+            // Lấy các tham số truy vấn
+            const { page = 1, limit = 10 } = query;
+            const offset = (page - 1) * limit;
+
+            // Lấy danh sách người dùng 
+            const users = await User.findAndCountAll({
+                offset: offset,
+                limit: parseInt(limit),
+                attributes: { exclude: ['uPassword'] }
+            });
+            return {
+                status: 'OK',
+                message: 'Lấy danh sách người dùng thành công',
+                data: {
+                    users: users.rows,
+                    pagination: {
+                        total: users.count,
+                        page: parseInt(page),
+                        limit: parseInt(limit),
+                        totalPages: Math.ceil(users.count / limit)
+                    }
+                }
+            };
+
+        } catch (error) {
+            return { status: 'ERR', message: 'Lỗi lấy danh sách người dùng', error: error.message };
+        };
+    },
+
+    findUserByEmail: async (email) => {
+        try {
+            const user = await User.findOne({
+                where: { uEmail: email }
+            });
+            return user;
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    },
+
+    hashPassword: async (password) => {
+        const salt = await bcrypt.genSalt(10);
+        return bcrypt.hash(password, salt);
     }
 };
 
-const loginUser = async (userLogin) => {
-    const { email, password } = userLogin;
-    try {
-        const user = await User.findOne({ where: { email } });
-        if (!user) {
-            return {
-                status: 'ERR',
-                message: 'Người dùng không tồn tại',
-            };
-        }
+module.exports = UserService;
 
-        const comparePassword = bcrypt.compareSync(password, user.cPassword);
-        if (!comparePassword) {
-            return {
-                status: 'ERR',
-                message: 'Mật khẩu không chính xác',
-            };
-        }
 
-        const access_token = await generalAccessToken({
-            id: user.id,
-            isAdmin: user.isAdmin
-        });
-        const refresh_token = await generalRefreshToken({
-            id: user.id,
-            isAdmin: user.isAdmin
-        });
 
-        return {
-            status: 'OK',
-            message: 'Đăng nhập thành công',
-            access_token,
-            refresh_token
-        };
-    } catch (error) {
-        throw new Error(error.message);
-    }
-};
 
-const updateUser = async (id, data) => {
-    try {
-        const user = await User.findByPk(id);
-        if (!user) {
-            return {
-                status: 'ERR',
-                message: 'Người dùng không tồn tại',
-            };
-        }
-
-        await user.update(data);
-        return {
-            status: 'OK',
-            message: 'Cập nhật người dùng thành công',
-        };
-    } catch (error) {
-        throw new Error(error.message);
-    }
-};
-
-const deleteUser = async (id) => {
-    try {
-        const user = await User.findByPk(id);
-        if (!user) {
-            return {
-                status: 'ERR',
-                message: 'Người dùng không tồn tại',
-            };
-        }
-
-        await user.destroy();
-        return {
-            status: 'OK',
-            message: 'Xóa người dùng thành công'
-        };
-    } catch (error) {
-        throw new Error(error.message);
-    }
-};
-
-const getAllUsers = async () => {
-    try {
-        const users = await User.findAll();
-        return {
-            status: 'OK',
-            message: 'Thành công',
-            data: users
-        };
-    } catch (error) {
-        throw new Error(error.message);
-    }
-};
-
-const getDetailUser = async (id) => {
-    try {
-        const user = await User.findByPk(id);
-        if (!user) {
-            return {
-                status: 'ERR',
-                message: 'Người dùng không tồn tại',
-            };
-        }
-
-        return {
-            status: 'OK',
-            message: 'Thành công',
-            data: user
-        };
-    } catch (error) {
-        throw new Error(error.message);
-    }
-};
-
-module.exports = {
-    createUser,
-    loginUser,
-    updateUser,
-    deleteUser,
-    getAllUsers,
-    getDetailUser
-};

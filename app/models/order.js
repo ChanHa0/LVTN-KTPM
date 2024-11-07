@@ -2,28 +2,34 @@ const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('Order', {
     oId: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       field: 'O_ID'
     },
+    uId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'USER',
+        key: 'U_ID'
+      },
+      field: 'U_ID'
+    },
     cId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'CUSTOMER',
+        model: 'CART',
         key: 'C_ID'
       },
       field: 'C_ID'
     },
-    scId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'SHOPPINGCART',
-        key: 'SC_ID'
-      },
-      field: 'SC_ID'
+    oStatus: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      field: 'O_STATUS'
     },
     oOrderdate: {
       type: DataTypes.DATE,
@@ -31,14 +37,19 @@ module.exports = function(sequelize, DataTypes) {
       field: 'O_ORDERDATE'
     },
     oTotalamount: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(255),
       allowNull: true,
       field: 'O_TOTALAMOUNT'
     },
-    oStatus: {
-      type: DataTypes.BOOLEAN,
+    oShippingaddress: {
+      type: DataTypes.STRING(255),
       allowNull: true,
-      field: 'O_STATUS'
+      field: 'O_SHIPPINGADDRESS'
+    },
+    oShippingmethod: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      field: 'O_SHIPPINGMETHOD'
     }
   }, {
     sequelize,
@@ -56,13 +67,13 @@ module.exports = function(sequelize, DataTypes) {
       {
         name: "RELATIONSHIP_4_FK",
         fields: [
-          { name: "C_ID" },
+          { name: "U_ID" },
         ]
       },
       {
         name: "RELATIONSHIP_6_FK",
         fields: [
-          { name: "SC_ID" },
+          { name: "C_ID" },
         ]
       },
     ]

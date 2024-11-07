@@ -1,111 +1,129 @@
-const DB = require('../models');
-const Order = DB.Order;
-const OrderItem = DB.OrderItem; // Giả sử bạn có mô hình OrderItem
+const { Order, User, Cart } = require('../models');
 
-const createOrder = async (orderData) => {
-    try {
-        const { customerId, items, total } = orderData;
-        const order = await Order.create({ customerId, total });
+const OrderService = {
+    createOrder: async (orderData) => {
+        try {
+            const { uId, cId, oTotalamount, oShippingaddress, oShippingmethod } = orderData;
 
-        for (const item of items) {
-            await OrderItem.create({
-                orderId: order.id,
-                productId: item.productId,
-                quantity: item.quantity,
-                price: item.price
+            // Kiểm tra user tồn tại
+            const user = await User.findByPk(uId);
+            if (!user) {
+                return { status: 'ERR', message: 'Không tìm thấy người dùng' };
+            }
+
+            // Kiểm tra cart tồn tại
+            const cart = await Cart.findByPk(cId);
+            if (!cart) {
+                return { status: 'ERR', message: 'Không tìm thấy giỏ hàng' };
+            }
+
+            // Tạo đơn hàng mới
+            const order = await Order.create({
+                uId,
+                cId,
+                oOrderdate: new Date(),
+                oTotalamount,
+                oStatus: true,
+                oShippingaddress,
+                oShippingmethod
             });
+
+            return { status: 'OK', message: 'Tạo đơn hàng thành công', data: order };
+
+        } catch (error) {
+            return { status: 'ERR', message: 'Lỗi khi tạo đơn hàng', error: error.message };
         }
+    },
 
-        return {
-            status: 'OK',
-            message: 'Tạo đơn hàng thành công',
-            data: order
-        };
-    } catch (error) {
-        throw new Error(error.message);
-    }
-};
+    updateOrder: async (id, updateData) => {
+        try {
+            const order = await Order.findByPk(id);
+            if (!order) {
+                return { status: 'ERR', message: 'Không tìm thấy đơn hàng' };
+            }
 
-const updateOrder = async (id, data) => {
-    try {
-        const order = await Order.findByPk(id);
-        if (!order) {
-            return {
-                status: 'ERR',
-                message: 'Không tìm thấy đơn hàng'
+            await order.update(updateData);
+
+            return { status: 'OK', message: 'Cập nhật đơn hàng thành công', data: order };
+
+        } catch (error) {
+            return { status: 'ERR', message: 'Lỗi khi cập nhật đơn hàng', error: error.message };
+        }
+    },
+
+    deleteOrder: async (id) => {
+        try {
+            const order = await Order.findByPk(id);
+            if (!order) {
+                return { status: 'ERR', message: 'Không tìm thấy đơn hàng' };
+            }
+
+            await order.destroy();
+            return { status: 'OK', message: 'Xóa đơn hàng thành công' };
+
+        } catch (error) {
+            return { status: 'ERR', message: 'Lỗi khi xóa đơn hàng', error: error.message };
+        }
+    },
+
+    getAllOrders: async (query = {}) => {
+        try {
+            const { page = 1, limit = 10, status } = query;
+            const offset = (page - 1) * limit;
+
+            let queryOptions = {
+                offset,
+                limit: parseInt(limit),
+                include: [
+                    { model: User },
+                    { model: Cart }
+                ],
+                order: [['oOrderdate', 'DESC']]
             };
-        }
 
-        await order.update(data);
-        return {
-            status: 'OK',
-            message: 'Cập nhật đơn hàng thành công',
-            data: order
-        };
-    } catch (error) {
-        throw new Error(error.message);
-    }
-};
+            if (status !== undefined) {
+                queryOptions.where = { oStatus: status };
+            }
 
-const deleteOrder = async (id) => {
-    try {
-        const order = await Order.findByPk(id);
-        if (!order) {
+            const orders = await Order.findAndCountAll(queryOptions);
+
             return {
-                status: 'ERR',
-                message: 'Không tìm thấy đơn hàng'
+                status: 'OK',
+                message: 'Lấy danh sách đơn hàng thành công',
+                data: {
+                    orders: orders.rows,
+                    pagination: {
+                        total: orders.count,
+                        page: parseInt(page),
+                        limit: parseInt(limit),
+                        totalPages: Math.ceil(orders.count / limit)
+                    }
+                }
             };
+        } catch (error) {
+            return { status: 'ERR', message: 'Lỗi khi lấy danh sách đơn hàng', error: error.message };
         }
+    },
 
-        await order.destroy();
-        return {
-            status: 'OK',
-            message: 'Xóa đơn hàng thành công'
-        };
-    } catch (error) {
-        throw new Error(error.message);
-    }
-};
+    getOrderById: async (id) => {
+        try {
+            const order = await Order.findByPk(id, {
+                include: [
+                    { model: User },
+                    { model: Cart }
+                ]
+            });
 
-const getAllOrders = async () => {
-    try {
-        const orders = await Order.findAll();
-        return {
-            status: 'OK',
-            message: 'Lấy danh sách đơn hàng thành công',
-            data: orders
-        };
-    } catch (error) {
-        throw new Error(error.message);
-    }
-};
+            if (!order) {
+                return { status: 'ERR', message: 'Không tìm thấy đơn hàng' };
+            }
 
-const getOrderDetail = async (id) => {
-    try {
-        const order = await Order.findByPk(id, {
-            include: [{ model: OrderItem }] // Giả sử bạn có mô hình OrderItem
-        });
-        if (!order) {
-            return {
-                status: 'ERR',
-                message: 'Không tìm thấy đơn hàng'
-            };
+            return { status: 'OK', message: 'Lấy chi tiết đơn hàng thành công', data: order };
+
+        } catch (error) {
+            return { status: 'ERR', message: 'Lỗi khi lấy chi tiết đơn hàng', error: error.message };
         }
-
-        return {
-            status: 'OK',
-            message: 'Lấy chi tiết đơn hàng thành công',
-            data: order
-        };
-    } catch (error) {
-        throw new Error(error.message);
     }
 };
 
-module.exports = {
-    createOrder,
-    updateOrder,
-    deleteOrder,
-    getAllOrders,
-    getOrderDetail
-};
+module.exports = OrderService;

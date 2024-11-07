@@ -1,59 +1,54 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Product', {
-    prId: {
+  return sequelize.define('User', {
+    uId: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      field: 'PR_ID'
+      field: 'U_ID'
     },
-    prTitle: {
+    uName: {
       type: DataTypes.STRING(255),
       allowNull: true,
-      field: 'PR_TITLE'
+      field: 'U_NAME'
     },
-    prAuthor: {
+    uPassword: {
       type: DataTypes.STRING(255),
       allowNull: true,
-      field: 'PR_AUTHOR'
+      field: 'U_PASSWORD'
     },
-    prImage: {
+    uEmail: {
       type: DataTypes.STRING(255),
       allowNull: true,
-      field: 'PR_IMAGE'
+      field: 'U_EMAIL'
     },
-    prDescription: {
+    uAddress: {
       type: DataTypes.STRING(255),
       allowNull: true,
-      field: 'PR_DESCRIPTION'
+      field: 'U_ADDRESS'
     },
-    prCategory: {
+    uPhone: {
       type: DataTypes.STRING(255),
       allowNull: true,
-      field: 'PR_CATEGORY'
+      field: 'U_PHONE'
     },
-    prStockquanlity: {
-      type: DataTypes.INTEGER,
+    uIsadmin: {
+      type: DataTypes.BOOLEAN,
       allowNull: true,
-      field: 'PR_STOCKQUANLITY'
-    },
-    prPrice: {
-      type: DataTypes.DECIMAL(10,2),
-      allowNull: true,
-      field: 'PR_PRICE'
+      field: 'U_ISADMIN'
     }
   }, {
     sequelize,
-    tableName: 'PRODUCT',
+    tableName: 'USER',
     schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PK_PRODUCT",
+        name: "PK_USER",
         unique: true,
         fields: [
-          { name: "PR_ID" },
+          { name: "U_ID" },
         ]
       },
     ]

@@ -1,5 +1,5 @@
 const SequelizeAuto = require('sequelize-auto');
-const { sequelize } = require('../config/database');
+const { sequelize } = require('../config/connectDB');
 
 const auto = new SequelizeAuto(sequelize, null, null, {
     directory: './app/models',
@@ -10,7 +10,7 @@ const auto = new SequelizeAuto(sequelize, null, null, {
     additional: {
         timestamps: false
     },
-    tables: ['ADMIN', 'PRODUCT', 'PRODUCTCATEGORY', 'CARTDETAIL', 'CATEGORY', 'CUSTOMER', 'MANAGEPRODUCT', 'MANAGECUSTOMER', 'MANAGEORDER', 'ORDER', 'ORDERDETAIL', 'PAYMENT', 'REVIEW', 'SHOPPINGCART']
+    tables: ['CART', 'CARTDETAIL', 'ORDER', 'ORDERDETAIL', 'PAYMENT', 'PRODUCT', 'USER']
 });
 
 auto.run().then(() => {

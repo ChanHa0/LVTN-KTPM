@@ -1,85 +1,54 @@
-const { DataTypes } = require('sequelize');
+var DataTypes = require("sequelize").DataTypes;
+var _Cart = require("./cart");
+var _Cartdetail = require("./cartdetail");
+var _Order = require("./order");
+var _Orderdetail = require("./orderdetail");
+var _Payment = require("./payment");
+var _Product = require("./product");
+var _User = require("./user");
 
 function initModels(sequelize) {
-  // Định nghĩa các models
-  const Admin = require("./admin")(sequelize, DataTypes);
-  const Category = require("./category")(sequelize, DataTypes);
-  const Customer = require("./customer")(sequelize, DataTypes);
-  const Manageproduct = require("./manageproduct")(sequelize, DataTypes);
-  const Order = require("./order")(sequelize, DataTypes);
-  const Payment = require("./payment")(sequelize, DataTypes);
-  const Product = require("./product")(sequelize, DataTypes);
-  const Productcategory = require("./productcategory")(sequelize, DataTypes);
-  const Review = require("./review")(sequelize, DataTypes);
-  const Shoppingcart = require("./shoppingcart")(sequelize, DataTypes);
+  var Cart = _Cart(sequelize, DataTypes);
+  var Cartdetail = _Cartdetail(sequelize, DataTypes);
+  var Order = _Order(sequelize, DataTypes);
+  var Orderdetail = _Orderdetail(sequelize, DataTypes);
+  var Payment = _Payment(sequelize, DataTypes);
+  var Product = _Product(sequelize, DataTypes);
+  var User = _User(sequelize, DataTypes);
 
-  // Định nghĩa các mối quan hệ
-  Manageproduct.belongsTo(Admin, {
-    as: "admin",
-    foreignKey: "aId"
-  });
-  Admin.hasMany(Manageproduct, {
-    as: "manageproducts",
-    foreignKey: "aId"
-  });
-
-  Productcategory.belongsTo(Category, {
-    as: "category",
-    foreignKey: "cgCategoryid"
-  });
-  Category.hasMany(Productcategory, {
-    as: "productcategories",
-    foreignKey: "cgCategoryid"
-  });
-
-  Order.belongsTo(Customer, {
-    as: "customer",
-    foreignKey: "cId"
-  });
-  Customer.hasMany(Order, {
-    as: "orders",
-    foreignKey: "cId"
-  });
-
-  Payment.belongsTo(Customer, {
-    as: "customer",
-    foreignKey: "cId"
-  });
-  Customer.hasMany(Payment, {
-    as: "payments",
-    foreignKey: "cId"
-  });
-
-  Review.belongsTo(Customer, {
-    as: "customer",
-    foreignKey: "cId"
-  });
-  Customer.hasMany(Review, {
-    as: "reviews",
-    foreignKey: "cId"
-  });
-
-  Shoppingcart.belongsTo(Customer, {
-    as: "customer",
-    foreignKey: "cId"
-  });
-  Customer.hasMany(Shoppingcart, {
-    as: "shoppingcarts",
-    foreignKey: "cId"
-  });
+  Cart.belongsToMany(Product, { as: 'prIdProducts', through: Cartdetail, foreignKey: "cId", otherKey: "prId" });
+  Order.belongsToMany(Product, { as: 'prIdProductOrderdetails', through: Orderdetail, foreignKey: "oId", otherKey: "prId" });
+  Product.belongsToMany(Cart, { as: 'cIdCarts', through: Cartdetail, foreignKey: "prId", otherKey: "cId" });
+  Product.belongsToMany(Order, { as: 'oIdOrders', through: Orderdetail, foreignKey: "prId", otherKey: "oId" });
+  Cartdetail.belongsTo(Cart, { as: "c", foreignKey: "cId"});
+  Cart.hasMany(Cartdetail, { as: "cartdetails", foreignKey: "cId"});
+  Order.belongsTo(Cart, { as: "c", foreignKey: "cId"});
+  Cart.hasMany(Order, { as: "orders", foreignKey: "cId"});
+  Orderdetail.belongsTo(Order, { as: "o", foreignKey: "oId"});
+  Order.hasMany(Orderdetail, { as: "orderdetails", foreignKey: "oId"});
+  Payment.belongsTo(Order, { as: "o", foreignKey: "oId"});
+  Order.hasMany(Payment, { as: "payments", foreignKey: "oId"});
+  Cartdetail.belongsTo(Product, { as: "pr", foreignKey: "prId"});
+  Product.hasMany(Cartdetail, { as: "cartdetails", foreignKey: "prId"});
+  Orderdetail.belongsTo(Product, { as: "pr", foreignKey: "prId"});
+  Product.hasMany(Orderdetail, { as: "orderdetails", foreignKey: "prId"});
+  Cart.belongsTo(User, { as: "u", foreignKey: "uId"});
+  User.hasMany(Cart, { as: "carts", foreignKey: "uId"});
+  Order.belongsTo(User, { as: "u", foreignKey: "uId"});
+  User.hasMany(Order, { as: "orders", foreignKey: "uId"});
+  Payment.belongsTo(User, { as: "u", foreignKey: "uId"});
+  User.hasMany(Payment, { as: "payments", foreignKey: "uId"});
 
   return {
-    Admin,
-    Category,
-    Customer,
-    Manageproduct,
+    Cart,
+    Cartdetail,
     Order,
+    Orderdetail,
     Payment,
     Product,
-    Productcategory,
-    Review,
-    Shoppingcart
+    User,
   };
 }
-
 module.exports = initModels;
+module.exports.initModels = initModels;
+module.exports.default = initModels;

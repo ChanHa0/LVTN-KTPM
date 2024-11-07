@@ -1,43 +1,44 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Shoppingcart', {
-    scId: {
+  return sequelize.define('Cart', {
+    cId: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      field: 'SC_ID'
+      field: 'C_ID'
     },
-    cId: {
+    uId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'CUSTOMER',
-        key: 'C_ID'
+        model: 'USER',
+        key: 'U_ID'
       },
-      field: 'C_ID'
+      field: 'U_ID'
     },
-    scCreateddate: {
-      type: DataTypes.DATE,
+    cStatus: {
+      type: DataTypes.STRING(255),
       allowNull: true,
-      field: 'SC_CREATEDDATE'
+      field: 'C_STATUS'
     }
   }, {
     sequelize,
-    tableName: 'SHOPPINGCART',
+    tableName: 'CART',
     schema: 'dbo',
     timestamps: false,
     indexes: [
       {
-        name: "PK_SHOPPINGCART",
+        name: "PK_CART",
         unique: true,
         fields: [
-          { name: "SC_ID" },
+          { name: "C_ID" },
         ]
       },
       {
         name: "RELATIONSHIP_1_FK",
         fields: [
-          { name: "C_ID" },
+          { name: "U_ID" },
         ]
       },
     ]

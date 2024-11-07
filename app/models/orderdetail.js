@@ -23,7 +23,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     odId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       field: 'OD_ID'
     },
     odQuantity: {
@@ -31,10 +31,10 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       field: 'OD_QUANTITY'
     },
-    odPrice: {
+    odTotalprice: {
       type: DataTypes.DECIMAL(10,2),
       allowNull: true,
-      field: 'OD_PRICE'
+      field: 'OD_TOTALPRICE'
     }
   }, {
     sequelize,
@@ -42,6 +42,12 @@ module.exports = function(sequelize, DataTypes) {
     schema: 'dbo',
     timestamps: false,
     indexes: [
+      {
+        name: "ORDERDETAIL_FK",
+        fields: [
+          { name: "PR_ID" },
+        ]
+      },
       {
         name: "ORDERDETAIL2_FK",
         fields: [

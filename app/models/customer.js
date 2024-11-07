@@ -1,7 +1,8 @@
 const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('Customer', {
     cId: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
@@ -26,6 +27,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(100),
       allowNull: true,
       field: 'C_EMAIL'
+    },
+    password: {  // Thêm trường password
+      type: DataTypes.STRING,
+      field: 'C_PASSWORD'
     },
     cPhonenumber: {
       type: DataTypes.STRING(11),
