@@ -66,19 +66,26 @@ const ProductService = {
         }
     },
 
-    getAllProducts: async () => {
+    getAllProduct: async () => {
         try {
             // Lấy tất cả sản phẩm mà không cần phân trang
-            const products = await Product.findAll();
-            return {
-                status: 'OK',
-                message: 'Lấy danh sách sản phẩm thành công',
-                data: {
-                    products: products
-                }
-            };
+            const product = await Product.findAll();
+            return { status: 'OK', message: 'Lấy danh sách sản phẩm thành công', data: { product: product } };
+
         } catch (error) {
             return { status: 'ERR', message: 'Lỗi lấy danh sách sản phẩm', error: error.message };
+        }
+    },
+    getDetailProduct: async (id) => {
+        try {
+            const product = await Product.findByPk(id);
+            if (!product) {
+                return { status: 'ERR', message: 'Sản phẩm không tồn tại' };
+            }
+            return { status: 'OK', message: 'Lấy chi tiết sản phẩm thành công', data: product };
+
+        } catch (error) {
+            return { status: 'ERR', message: 'Lỗi lấy chi tiết sản phẩm', error: error.message };
         }
     },
     searchProducts: async (query) => {

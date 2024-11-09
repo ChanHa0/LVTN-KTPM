@@ -1,6 +1,8 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser');
+const compression = require('compression');
+const errorHandler = require('./middlewares/errorHandler');
 const { sequelize } = require('./config/connectDB');
 const dotenv = require('dotenv')
 dotenv.config()
@@ -15,17 +17,18 @@ app.use(cors({
 }));
 app.use(express.json())
 app.use(bodyParser.json())
-
+app.use(compression())
 // Config router
 const UserRouter = require('./routes/UserRouter')
 const ProductRouter = require('./routes/ProductRouter')
-const OrderRouter = require('./routes/OrderRouter')
-const StatisticRouter = require('./routes/StatisticRouter')
+const CartRouter = require('./routes/CartRouter')
 
 app.use('/api/user', UserRouter)
 app.use('/api/product', ProductRouter)
-app.use('/api/order', OrderRouter)
-app.use('/api/statistic', StatisticRouter)
+app.use('/api/cart', CartRouter)
+
+app.use(errorHandler)
+
 
 async function startServer() {
     try {

@@ -1,7 +1,7 @@
 const ProductService = require('../services/ProductService');
 
 const ProductController = {
-    async createProduct(req, res) {
+    createProduct: async (req, res) => {
         try {
             const result = await ProductService.createProduct(req.body);
             if (result.status === 'ERR') {
@@ -13,7 +13,7 @@ const ProductController = {
         }
     },
 
-    async updateProduct(req, res) {
+    updateProduct: async (req, res) => {
         try {
             const { id } = req.params;
             const result = await ProductService.updateProduct(id, req.body);
@@ -28,7 +28,7 @@ const ProductController = {
         }
     },
 
-    async deleteProduct(req, res) {
+    deleteProduct: async (req, res) => {
         try {
             const { id } = req.params;
             const result = await ProductService.deleteProduct(id);
@@ -43,10 +43,9 @@ const ProductController = {
         }
     },
 
-    async getAllProducts(req, res) {
+    getAllProduct: async (req, res) => {
         try {
-            const { page = 1, limit = 10, sort, filter } = req.query;
-            const result = await ProductService.getAllProducts({ page, limit, sort, filter });
+            const result = await ProductService.getAllProduct();
 
             res.json(result);
         } catch (error) {
@@ -54,24 +53,22 @@ const ProductController = {
         }
     },
 
-    async getFeaturedProducts(req, res) {
+    getDetailProduct: async (req, res) => {
         try {
-            const result = await ProductService.getFeaturedProducts();
+            const { id } = req.params;
+            const result = await ProductService.getDetailProduct(id);
             res.json(result);
         } catch (error) {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    async searchProducts(req, res) {
+
+    searchProduct: async (req, res) => {
         try {
-            const result = await ProductService.searchProducts(req.query);
+            const result = await ProductService.searchProduct(req.query);
             res.json(result);
         } catch (error) {
-            res.status(500).json({
-                status: 'ERR',
-                message: 'Lỗi server',
-                error: error.message
-            });
+            res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
 };

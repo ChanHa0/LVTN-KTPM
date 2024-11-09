@@ -131,7 +131,7 @@ const UserService = {
         };
     },
 
-    getAllUsers: async (query) => {
+    getAllUser: async (query) => {
         try {
             // Lấy các tham số truy vấn
             const { page = 1, limit = 10 } = query;
@@ -159,6 +159,18 @@ const UserService = {
 
         } catch (error) {
             return { status: 'ERR', message: 'Lỗi lấy danh sách người dùng', error: error.message };
+        };
+    },
+    getDetailUser: async (id) => {
+        try {
+            const user = await User.findByPk(id);
+            if (!user) {
+                return { status: 'ERR', message: 'Không tìm thấy người dùng' };
+            }
+            return { status: 'OK', message: 'Lấy chi tiết người dùng thành công', data: user };
+
+        } catch (error) {
+            return { status: 'ERR', message: 'Lỗi lấy chi tiết người dùng', error: error.message };
         };
     },
 

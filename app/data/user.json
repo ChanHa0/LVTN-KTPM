@@ -1,0 +1,8 @@
+{
+    "uName": "admin",
+    "uPassword": "admin",
+    "uEmail": "admin@gmail.com",
+    "uAddress": "Hà Nội",
+    "uPhone": "0987654321",
+    "uIsadmin": true
+}

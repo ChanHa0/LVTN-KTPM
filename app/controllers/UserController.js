@@ -1,7 +1,7 @@
 const UserService = require('../services/UserService');
 
 const UserController = {
-    async createUser(req, res) {
+    registerUser: async (req, res) => {
         try {
             const result = await UserService.registerUser(req.body);
             if (result.status === 'ERR') {
@@ -13,7 +13,7 @@ const UserController = {
         }
     },
 
-    async loginUser(req, res) {
+    loginUser: async (req, res) => {
         try {
             const result = await UserService.loginUser(req.body);
             if (result.status === 'ERR') {
@@ -25,7 +25,7 @@ const UserController = {
         }
     },
 
-    async updateUser(req, res) {
+    updateUser: async (req, res) => {
         try {
             const { id } = req.params;
             const result = await UserService.updateUser(id, req.body);
@@ -40,7 +40,7 @@ const UserController = {
         }
     },
 
-    async deleteUser(req, res) {
+    deleteUser: async (req, res) => {
         try {
             const { id } = req.params;
             const result = await UserService.deleteUser(id);
@@ -55,16 +55,26 @@ const UserController = {
         }
     },
 
-    async getAllUsers(req, res) {
+    getAllUser: async (req, res) => {
         try {
             const { page = 1, limit = 10 } = req.query;
-            const result = await UserService.getAllUsers({ page, limit });
+            const result = await UserService.getAllUser({ page, limit });
 
             res.json(result);
         } catch (error) {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
+
+    getDetailUser: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const result = await UserService.getDetailUser(id);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
+        }
+    }
 };
 
 module.exports = UserController;
