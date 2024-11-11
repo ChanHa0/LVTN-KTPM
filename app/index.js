@@ -23,6 +23,7 @@ const UserRouter = require('./routes/UserRouter')
 const ProductRouter = require('./routes/ProductRouter')
 const CartRouter = require('./routes/CartRouter')
 
+
 app.use('/api/user', UserRouter)
 app.use('/api/product', ProductRouter)
 app.use('/api/cart', CartRouter)
