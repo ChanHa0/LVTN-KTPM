@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminNavbar from '../../components/admin/AdminNavbar';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
-import userService from '../../api/userApi';
+import userService from '../../api/userApi'
 
 const ManageUsers = () => {
     const [users, setUsers] = useState([]);
@@ -26,13 +26,17 @@ const ManageUsers = () => {
     const fetchUsers = async () => {
         try {
             setLoading(true);
-            const response = await userService.getAllUsers(currentPage, 10);
+            const response = await userService.getAllUser(currentPage, 10);
             if (response.status === 'OK') {
                 setUsers(response.data.users);
                 setTotalPages(response.data.pagination.totalPages);
+            } else {
+                throw new Error('Lỗi khi tải dữ liệu');
             }
         } catch (error) {
             console.error('Lỗi khi tải danh sách người dùng:', error);
+            setUsers([]);
+            alert('Không thể tải danh sách người dùng');
         } finally {
             setLoading(false);
         }
@@ -75,10 +79,19 @@ const ManageUsers = () => {
         e.preventDefault();
         try {
             let response;
+            const userData = {
+                ...formData,
+                uIsadmin: formData.uIsadmin === 'true' // Chuyển đổi string sang boolean
+            };
+
             if (editingUser) {
-                response = await userService.updateUser(editingUser.uId, formData);
+                // Chỉ gửi password nếu có nhập mới
+                if (!userData.uPassword) {
+                    delete userData.uPassword;
+                }
+                response = await userService.updateUser(editingUser.uId, userData);
             } else {
-                response = await userService.createUser(formData);
+                response = await userService.createUser(userData);
             }
 
             if (response.status === 'OK') {
@@ -86,9 +99,11 @@ const ManageUsers = () => {
                 setShowForm(false);
                 resetForm();
                 fetchUsers();
+            } else {
+                throw new Error(response.message || 'Có lỗi xảy ra');
             }
         } catch (error) {
-            alert(error.response?.data?.message || 'Có lỗi xảy ra');
+            alert(error.response?.data?.message || 'Có lỗi xảy ra khi xử lý yêu cầu');
         }
     };
 
@@ -104,6 +119,28 @@ const ManageUsers = () => {
                 alert('Có lỗi xảy ra khi xóa người dùng');
             }
         }
+    };
+
+    const renderPagination = () => {
+        return (
+            <div className="flex justify-center mt-6">
+                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium
+                                ${currentPage === page
+                                    ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                }`}
+                        >
+                            {page}
+                        </button>
+                    ))}
+                </nav>
+            </div>
+        );
     };
 
     return (
@@ -242,85 +279,89 @@ const ManageUsers = () => {
                     </form>
                 )}
 
-                <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Họ tên
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Email
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Số điện thoại
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Địa chỉ
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Vai trò
-                                </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Thao tác
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {users.map((user) => (
-                                <tr key={user.uId}>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {user.uName}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {user.uEmail}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {user.uPhone}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {user.uAddress}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {user.uIsadmin ? 'Quản trị viên' : 'Người dùng'}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button
-                                            onClick={() => handleEdit(user)}
-                                            className="text-indigo-600 hover:text-indigo-900 mr-4"
-                                        >
-                                            <FaEdit />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(user.uId)}
-                                            className="text-red-600 hover:text-red-900"
-                                        >
-                                            <FaTrash />
-                                        </button>
-                                    </td>
+                {loading ? (
+                    <div className="flex justify-center items-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                    </div>
+                ) : (
+                    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Họ tên
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Email
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Số điện thoại
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Địa chỉ
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Vai trò
+                                    </th>
+                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Thao tác
+                                    </th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
 
-                <div className="flex justify-center mt-6">
-                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                            <button
-                                key={page}
-                                onClick={() => setCurrentPage(page)}
-                                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium
-                                    ${currentPage === page
-                                        ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
-                                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                                    }`}
-                            >
-                                {page}
-                            </button>
-                        ))}
-                    </nav>
-                </div>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {users.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
+                                            Không có người dùng nào
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    users.map((user) => (
+                                        <tr key={user.uId} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm font-medium text-gray-900">{user.uName}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-500">{user.uEmail}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-500">{user.uPhone}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-500">{user.uAddress}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.uIsadmin
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-gray-100 text-gray-800'
+                                                    }`}>
+                                                    {user.uIsadmin ? 'Quản trị viên' : 'Người dùng'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <button
+                                                    onClick={() => handleEdit(user)}
+                                                    className="text-indigo-600 hover:text-indigo-900 mr-4"
+                                                >
+                                                    <FaEdit />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(user.uId)}
+                                                    className="text-red-600 hover:text-red-900"
+                                                >
+                                                    <FaTrash />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
+                {renderPagination()}
             </div>
         </div>
     );

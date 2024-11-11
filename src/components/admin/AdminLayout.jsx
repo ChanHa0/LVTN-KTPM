@@ -1,6 +1,6 @@
 import React from 'react';
-import AdminHeader from '../components/admin/AdminHeader';
-import AdminFooter from '../components/admin/AdminFooter';
+import AdminHeader from './AdminHeader';
+import AdminFooter from './AdminFooter';
 
 const AdminLayout = ({ children }) => {
     return (

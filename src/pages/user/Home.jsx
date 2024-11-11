@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../../components/common/CategorySidebar';
-import HomeCarousel from '../../components/common/HomeCarousel';
-import ProductCard from '../../components/common/ProductCard';
+import Sidebar from '../../components/main/Sidebar';
+import HomeCarousel from '../../components/main/HomeCarousel';
+import ProductCard from '../../components/main/ProductCard';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
@@ -17,21 +17,21 @@ const Home = () => {
                 const response = await axios.get('http://localhost:5000/api/product/');
 
                 if (response.data && typeof response.data === 'object') {
-                    const productsData = Object.values(response.data);
+                    const productsData = Array.isArray(response.data)
+                        ? response.data
+                        : Object.values(response.data);
 
-                    if (Array.isArray(productsData)) {
-                        const products = productsData.map(product => ({
-                            id: product.prId,
-                            title: product.prTitle || 'Chưa cập nhật',
-                            price: product.prPrice || 0,
-                            image: product.image || "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
-                            author: product.prAuthor || 'Chưa cập nhật',
-                            publisher: product.prPublisher || 'Chưa cập nhật',
-                            yearOfPublication: product.prYearofpublication,
-                            stockQuantity: product.prStockquanlity || 0
-                        }));
-                        setBooks(products);
-                    }
+                    const products = productsData.map(product => ({
+                        id: product.prId,
+                        title: product.prTitle || 'Chưa cập nhật',
+                        price: product.prPrice || 0,
+                        image: product.image || "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
+                        author: product.prAuthor || 'Chưa cập nhật',
+                        publisher: product.prPublisher || 'Chưa cập nhật',
+                        yearOfPublication: product.prYearofpublication,
+                        stockQuantity: product.prStockquanlity || 0
+                    }));
+                    setBooks(products);
                 }
             } catch (error) {
                 console.error('Lỗi khi lấy danh sách sách:', error);

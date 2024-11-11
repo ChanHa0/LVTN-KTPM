@@ -2,23 +2,23 @@ import Dashboard from '../pages/admin/Dashboard';
 import ManageProducts from '../pages/admin/ManageProducts';
 import ManageOrders from '../pages/admin/ManageOrders';
 import ManageUsers from '../pages/admin/ManageUsers';
-import AdminLayout from '../layouts/AdminLayout';
+import AdminLayout from '../components/admin/AdminLayout';
 
 export const adminRoutes = [
     {
-        path: '/admin',
+        path: '/dashboard',
         element: <AdminLayout><Dashboard /></AdminLayout>
     },
     {
-        path: '/admin/quan-li-san-pham',
+        path: '/manage-product',
         element: <AdminLayout><ManageProducts /></AdminLayout>
     },
     {
-        path: '/admin/quan-li-don-hang',
+        path: '/manage-order',
         element: <AdminLayout><ManageOrders /></AdminLayout>
     },
     {
-        path: '/admin/quan-li-tai-khoan',
+        path: '/manage-user',
         element: <AdminLayout><ManageUsers /></AdminLayout>
     }
 ];

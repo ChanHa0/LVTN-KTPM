@@ -1,46 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FaShoppingCart, FaStar, FaHeart } from 'react-icons/fa';
-import axios from 'axios';
 import { useCart } from '../../contexts/CartContext';
-import ProductCard from '../../components/common/ProductCard';
+import ProductCard from '../../components/main/ProductCard';
+import LoadingSpinner from '../../components/main/LoadingSpinner';
+import useProduct from '../../hooks/useProduct';
+
 
 const Product = () => {
     const { id } = useParams();
     const { addToCart } = useCart();
-    const [product, setProduct] = useState(null);
-    const [relatedProducts, setRelatedProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { product, relatedProducts, loading } = useProduct(id);
     const [quantity, setQuantity] = useState(1);
-
-    useEffect(() => {
-        const fetchProductDetail = async () => {
-            try {
-                const response = await axios.get(`http://localhost:5000/api/product/${id}`);
-                if (response.data.status === 'OK') {
-                    setProduct(response.data.data);
-                    fetchRelatedProducts(response.data.data.prCategory);
-                }
-            } catch (error) {
-                console.error('Lỗi khi lấy thông tin sản phẩm:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProductDetail();
-    }, [id]);
-
-    const fetchRelatedProducts = async (category) => {
-        try {
-            const response = await axios.get(`http://localhost:5000/api/product/related/${category}`);
-            if (response.data.status === 'OK') {
-                setRelatedProducts(response.data.data.filter(p => p.prId !== id).slice(0, 5));
-            }
-        } catch (error) {
-            console.error('Lỗi khi lấy sản phẩm liên quan:', error);
-        }
-    };
 
     const handleAddToCart = () => {
         addToCart({
@@ -53,18 +24,8 @@ const Product = () => {
         });
     };
 
-    // Tham chiếu loading state từ OrderDetail.jsx
-    if (loading) return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            <div className="text-gray-600">Đang tải...</div>
-        </div>
-    );
-
-    if (!product) return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            <div className="text-red-600">Không tìm thấy sản phẩm</div>
-        </div>
-    );
+    if (loading) return <LoadingSpinner />;
+    if (!product) return <div>Không tìm thấy sản phẩm</div>;
 
     return (
         <div className="min-h-screen bg-gray-50 py-8">

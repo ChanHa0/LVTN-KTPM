@@ -1,7 +1,6 @@
 import React from 'react';
 import { FaBook, FaShoppingCart, FaUsers, FaDollarSign, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import AdminNavbar from '../../components/admin/AdminNavbar';
-// import { RevenueChart, TopSellingBooks } from './components';
 
 const Dashboard = () => {
     const stats = [

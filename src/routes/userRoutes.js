@@ -9,13 +9,13 @@ import Order from "../pages/user/Order";
 import OrderDetail from "../pages/user/OrderDetail";
 import Payment from "../pages/user/Payment";
 import NotFound from "../pages/user/NotFound";
-import UserLayout from "../layouts/UserLayout";
-import AuthLayout from "../layouts/AuthLayout";
+import MainLayout from "../components/main/MainLayout";
+import AuthLayout from "../components/main/MainLayout";
 
 export const userRoutes = [
     {
         path: '/',
-        element: <UserLayout><Home /></UserLayout>
+        element: <MainLayout><Home /></MainLayout>
     },
     {
         path: '/register',
@@ -27,31 +27,31 @@ export const userRoutes = [
     },
     {
         path: '/profile',
-        element: <UserLayout><Profile /></UserLayout>
+        element: <MainLayout><Profile /></MainLayout>
     },
     {
         path: '/product',
-        element: <UserLayout><Product /></UserLayout>
+        element: <MainLayout><Product /></MainLayout>
     },
     {
         path: '/product-detail',
-        element: <UserLayout><ProductDetail /></UserLayout>
+        element: <MainLayout><ProductDetail /></MainLayout>
     },
     {
         path: '/search',
-        element: <UserLayout><Search /></UserLayout>
+        element: <MainLayout><Search /></MainLayout>
     },
     {
         path: '/order',
-        element: <UserLayout><Order /></UserLayout>
+        element: <MainLayout><Order /></MainLayout>
     },
     {
         path: '/order-detail',
-        element: <UserLayout><OrderDetail /></UserLayout>
+        element: <MainLayout><OrderDetail /></MainLayout>
     },
     {
         path: '/payment',
-        element: <UserLayout><Payment /></UserLayout>
+        element: <MainLayout><Payment /></MainLayout>
     },
     {
         path: '*',

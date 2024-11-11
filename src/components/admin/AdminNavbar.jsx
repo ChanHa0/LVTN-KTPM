@@ -1,14 +1,14 @@
 import React from 'react';
-import { FaChartBar, FaBook, FaShoppingCart, FaUsers } from 'react-icons/fa';
+import { Link, useLocation } from 'react-router-dom';
 
 const AdminNavbar = () => {
-    const location = window.location.pathname;
+    const location = useLocation();
 
     const navItems = [
-        { path: '/admin', icon: <FaChartBar />, label: 'Thống kê' },
-        { path: '/admin/quan-li-san-pham', icon: <FaBook />, label: 'Quản lý sách' },
-        { path: '/admin/quan-li-don-hang', icon: <FaShoppingCart />, label: 'Đơn hàng' },
-        { path: '/admin/quan-li-tai-khoan', icon: <FaUsers />, label: 'Khách hàng' },
+        { path: '/dashboard', label: 'Thống kê' },
+        { path: '/manage-product', label: 'Quản lý sản phẩm' },
+        { path: '/manage-order', label: 'Quản lý đơn hàng' },
+        { path: '/manage-user', label: 'Quản lý khách hàng' },
     ];
 
     return (
@@ -17,17 +17,16 @@ const AdminNavbar = () => {
                 <div className="flex justify-between">
                     <div className="flex space-x-8">
                         {navItems.map((item) => (
-                            <a
+                            <Link
                                 key={item.path}
-                                href={item.path}
-                                className={`flex items-center px-3 py-4 text-sm font-medium transition-colors ${location === item.path
+                                to={item.path}
+                                className={`flex items-center px-3 py-4 text-sm font-medium ${location.pathname === item.path
                                     ? 'text-blue-600 border-b-2 border-blue-600'
                                     : 'text-gray-500 hover:text-blue-600'
                                     }`}
                             >
-                                {item.icon}
-                                <span className="ml-2">{item.label}</span>
-                            </a>
+                                {item.label}
+                            </Link>
                         ))}
                     </div>
                 </div>

@@ -31,9 +31,9 @@ const userService = {
         }
     },
 
-    getAllUsers: async () => {
+    getAllUser: async () => {
         try {
-            const response = await axiosClient.get('/api/user');
+            const response = await axiosClient.get('/api/user/all');
             return response.data;
         } catch (error) {
             console.error('Error fetching users:', error);
