@@ -8,6 +8,7 @@ const ProductController = {
                 return res.status(400).json(result);
             }
             res.status(201).json(result);
+
         } catch (error) {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
@@ -17,12 +18,11 @@ const ProductController = {
         try {
             const { id } = req.params;
             const result = await ProductService.updateProduct(id, req.body);
-
             if (result.status === 'ERR') {
                 return res.status(404).json(result);
             }
+            res.status(200).json(result);
 
-            res.json(result);
         } catch (error) {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
@@ -32,12 +32,11 @@ const ProductController = {
         try {
             const { id } = req.params;
             const result = await ProductService.deleteProduct(id);
-
             if (result.status === 'ERR') {
                 return res.status(404).json(result);
             }
+            res.status(200).json(result);
 
-            res.json(result);
         } catch (error) {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
@@ -46,8 +45,11 @@ const ProductController = {
     getAllProduct: async (req, res) => {
         try {
             const result = await ProductService.getAllProduct();
+            if (result.status === 'ERR') {
+                return res.status(404).json(result);
+            }
+            res.status(200).json(result);
 
-            res.json(result);
         } catch (error) {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
@@ -57,7 +59,11 @@ const ProductController = {
         try {
             const { id } = req.params;
             const result = await ProductService.getDetailProduct(id);
-            res.json(result);
+            if (result.status === 'ERR') {
+                return res.status(404).json(result);
+            }
+            res.status(200).json(result);
+
         } catch (error) {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
@@ -66,7 +72,11 @@ const ProductController = {
     searchProduct: async (req, res) => {
         try {
             const result = await ProductService.searchProduct(req.query);
-            res.json(result);
+            if (result.status === 'ERR') {
+                return res.status(404).json(result);
+            }
+            res.status(200).json(result);
+
         } catch (error) {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }

@@ -1,15 +1,20 @@
 {
-    "dependencies": {
-        "express-validator": "^6.14.0",
-        "winston": "^3.3.3",
-        "morgan": "^1.10.0",
-        "helmet": "^4.6.0",
-        "compression": "^1.7.4",
-        "express-rate-limit": "^5.5.0",
-        "swagger-ui-express": "^4.3.0"
-    },
-    "devDependencies": {
-        "jest": "^27.4.7",
-        "supertest": "^6.2.2"
-    }
+    "cId": 1,
+    "uId": 1,
+    "cStatus": "active",
+    "cartDetails": [
+        {
+            "cdId": 1,
+            "cId": 1,
+            "prId": 1,
+            "cdQuantity": 2,
+            "cdTotalprice": 200000,
+            "product": {
+                "prId": 1,
+                "prName": "Áo thun nam",
+                "prPrice": 100000,
+                "prImage": "path/to/image1.jpg"
+            }
+        }
+    ]
 }
