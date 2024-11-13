@@ -31,7 +31,7 @@ const userService = {
         }
     },
 
-    getAllUser: async () => {
+    getAllUsers: async () => {
         try {
             const response = await axiosClient.get('/api/user/all');
             return response.data;

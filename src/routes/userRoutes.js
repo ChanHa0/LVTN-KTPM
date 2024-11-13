@@ -2,15 +2,15 @@ import Home from "../pages/user/Home";
 import Register from "../pages/user/Register";
 import Login from "../pages/user/Login";
 import Profile from "../pages/user/Profile";
-import Product from "../pages/user/ProductDetail";
-import ProductDetail from "../pages/user/Product";
+import ProductDetail from "../pages/user/ProductDetail";
+import Product from "../pages/user/Product";
 import Search from "../pages/user/Search";
 import Order from "../pages/user/Order";
 import OrderDetail from "../pages/user/OrderDetail";
 import Payment from "../pages/user/Payment";
 import NotFound from "../pages/user/NotFound";
 import MainLayout from "../components/main/MainLayout";
-import AuthLayout from "../components/main/MainLayout";
+import AuthLayout from "../components/main/AuthLayout";
 
 export const userRoutes = [
     {

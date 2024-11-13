@@ -1,30 +1,52 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FaShoppingCart, FaStar, FaHeart } from 'react-icons/fa';
 import { useCart } from '../../contexts/CartContext';
 import ProductCard from '../../components/main/ProductCard';
 import LoadingSpinner from '../../components/main/LoadingSpinner';
 import useProduct from '../../hooks/useProduct';
-
-
+import { toast } from 'react-toastify';
+import axios from 'axios';
 const Product = () => {
     const { id } = useParams();
     const { addToCart } = useCart();
-    const { product, relatedProducts, loading } = useProduct(id);
+    const { product, relatedProducts, loading, error } = useProduct(id);
     const [quantity, setQuantity] = useState(1);
 
-    const handleAddToCart = () => {
-        addToCart({
-            id: product.prId,
-            title: product.prTitle,
-            price: product.prPrice,
-            image: product.prImage,
-            author: product.prAuthor,
-            quantity: quantity
-        });
+    const handleAddToCart = async () => {
+        try {
+            const response = await axios.post('/api/cart/add', {
+                prId: product.prId,
+                quantity: quantity
+            });
+
+            if (response.data.status === 'OK') {
+                toast.success('Thêm vào giỏ hàng thành công');
+                addToCart({
+                    id: product.prId,
+                    title: product.prTitle,
+                    price: product.prPrice,
+                    image: product.prImage,
+                    author: product.prAuthor,
+                    quantity: quantity
+                });
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            toast.error('Có lỗi xảy ra khi thêm vào giỏ hàng');
+        }
+    };
+
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(price);
     };
 
     if (loading) return <LoadingSpinner />;
+    if (error) return <div className="text-red-500">Có lỗi xảy ra: {error}</div>;
     if (!product) return <div>Không tìm thấy sản phẩm</div>;
 
     return (
@@ -58,20 +80,9 @@ const Product = () => {
                         {/* Thông tin sản phẩm */}
                         <div className="space-y-6">
                             <h1 className="text-2xl font-semibold">{product.prTitle}</h1>
-
-                            <div className="flex items-center gap-2">
-                                <div className="flex text-yellow-400">
-                                    {[1, 2, 3, 4, 5].map(star => (
-                                        <FaStar key={star} className="w-4 h-4" />
-                                    ))}
-                                </div>
-                                <span className="text-sm text-gray-600">(12 đánh giá)</span>
-                            </div>
-
                             <div className="space-y-4 text-gray-600">
                                 <p><span className="font-medium">Tác giả:</span> {product.prAuthor}</p>
-                                <p><span className="font-medium">Nhà xuất bản:</span> {product.prPublisher}</p>
-                                <p><span className="font-medium">Năm xuất bản:</span> {product.prYearofpublication}</p>
+                                <p><span className="font-medium">Thể loại:</span> {product.prCategory}</p>
                                 <p>
                                     <span className="font-medium">Tình trạng:</span>{' '}
                                     {product.prStockquanlity > 0 ? (
@@ -83,7 +94,7 @@ const Product = () => {
                             </div>
 
                             <div className="text-3xl font-bold text-blue-600">
-                                {product.prPrice.toLocaleString()}đ
+                                {formatPrice(product.prPrice)}
                             </div>
 
                             {product.prStockquanlity > 0 && (
@@ -145,14 +156,12 @@ const Product = () => {
                             {relatedProducts.map(product => (
                                 <ProductCard
                                     key={product.prId}
-                                    id={product.prId}
-                                    title={product.prTitle}
-                                    price={product.prPrice}
-                                    image={product.prImage}
-                                    author={product.prAuthor}
-                                    publisher={product.prPublisher}
-                                    yearOfPublication={product.prYearofpublication}
-                                    stockQuantity={product.prStockquanlity}
+                                    prId={product.prId}
+                                    prTitle={product.prTitle}
+                                    prPrice={product.prPrice}
+                                    prImage={product.prImage}
+                                    prAuthor={product.prAuthor}
+                                    prStockquanlity={product.prStockquanlity}
                                 />
                             ))}
                         </div>

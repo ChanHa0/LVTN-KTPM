@@ -31,7 +31,7 @@ const productService = {
         }
     },
 
-    getAllProducts: async () => {
+    getAllProduct: async () => {
         try {
             const response = await axiosClient.get('/api/product/all');
             return response.data;

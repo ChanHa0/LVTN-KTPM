@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaSearch, FaShoppingCart, FaUser } from 'react-icons/fa';
 import { useCart } from '../../contexts/CartContext';
@@ -45,32 +45,86 @@ const SearchBar = () => (
     </div>
 );
 
-const UserMenu = ({ isMenuOpen, setIsMenuOpen }) => (
-    <div className="relative">
-        <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-3 hover:bg-gray-100 rounded-full"
-        >
-            <FaUser className="text-blue-500" size={22} />
-        </button>
-        {isMenuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 border border-gray-100 z-50">
-                <Link
-                    to="/register"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-500"
-                >
-                    Đăng ký
-                </Link>
-                <Link
-                    to="/login"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-500"
-                >
-                    Đăng nhập
-                </Link>
-            </div>
-        )}
-    </div>
-);
+const UserMenu = ({ isMenuOpen, setIsMenuOpen }) => {
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            setUser(JSON.parse(userStr));
+        }
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setUser(null);
+        window.location.href = '/';
+    };
+
+    return (
+        <div className="relative">
+            <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="p-3 hover:bg-gray-100 rounded-full"
+            >
+                <FaUser className="text-blue-500" size={22} />
+            </button>
+            {isMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 border border-gray-100 z-50">
+                    {user ? (
+                        <>
+                            <div className="px-4 py-2 text-gray-600 border-b border-gray-100">
+                                {user.email}
+                            </div>
+                            {user.role === true && (
+                                <Link
+                                    to="/dashboard"
+                                    className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-500"
+                                >
+                                    Quản lý
+                                </Link>
+                            )}
+                            <Link
+                                to="/profile"
+                                className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-500"
+                            >
+                                Thông tin cá nhân
+                            </Link>
+                            <Link
+                                to="/orders"
+                                className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-500"
+                            >
+                                Đơn hàng của tôi
+                            </Link>
+                            <button
+                                onClick={handleLogout}
+                                className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-500"
+                            >
+                                Đăng xuất
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <Link
+                                to="/register"
+                                className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-500"
+                            >
+                                Đăng ký
+                            </Link>
+                            <Link
+                                to="/login"
+                                className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-500"
+                            >
+                                Đăng nhập
+                            </Link>
+                        </>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};
 
 const CartButton = ({ cartCount }) => (
     <div className="relative">

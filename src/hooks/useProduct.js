@@ -1,44 +1,50 @@
 import { useState, useEffect } from 'react';
-import productApi from '../api/productApi';
+import axios from 'axios';
 
 const useProduct = (productId) => {
     const [product, setProduct] = useState(null);
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchProduct = async () => {
+        const fetchProductData = async () => {
             try {
                 setLoading(true);
-                const response = await productApi.getProductById(productId);
-                if (response.status === 'OK') {
-                    setProduct(response.data);
-                    fetchRelatedProducts(response.data.prCategory);
+                // Gọi API lấy chi tiết sản phẩm
+                const { data: productResponse } = await axios.get(`/api/product/${productId}`);
+
+                if (productResponse.status === 'OK') {
+                    setProduct(productResponse.data);
+
+                    // Gọi API lấy sản phẩm liên quan
+                    const { data: relatedResponse } = await axios.get('/api/product/search', {
+                        params: {
+                            category: productResponse.data.prCategory,
+                            limit: 5
+                        }
+                    });
+
+                    if (relatedResponse.status === 'OK') {
+                        const filteredProducts = relatedResponse.data.products.filter(
+                            p => p.prId !== parseInt(productId)
+                        );
+                        setRelatedProducts(filteredProducts);
+                    }
                 }
-            } catch (error) {
-                console.error('Lỗi khi tải thông tin sản phẩm:', error);
+            } catch (err) {
+                setError(err.message);
             } finally {
                 setLoading(false);
             }
         };
 
         if (productId) {
-            fetchProduct();
+            fetchProductData();
         }
     }, [productId]);
 
-    const fetchRelatedProducts = async (category) => {
-        try {
-            const response = await productApi.getRelatedProducts(category);
-            if (response.status === 'OK') {
-                setRelatedProducts(response.data);
-            }
-        } catch (error) {
-            console.error('Lỗi khi tải sản phẩm liên quan:', error);
-        }
-    };
-
-    return { product, relatedProducts, loading };
+    return { product, relatedProducts, loading, error };
 };
 
 export default useProduct;

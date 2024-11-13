@@ -1,58 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import AdminNavbar from '../../components/admin/AdminNavbar';
-import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
+import { toast } from 'react-toastify';
+import LoadingSpinner from '../../components/main/LoadingSpinner';
 import productApi from '../../api/productApi';
 
 const ManageProducts = () => {
     const [products, setProducts] = useState([]);
-    const [showForm, setShowForm] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+    const [showForm, setShowForm] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
     const [formData, setFormData] = useState({
         prTitle: '',
         prAuthor: '',
         prCategory: '',
-        prStockquanlity: '',
+        prDescription: '',
+        prImage: '',
+        prStockQuanlity: '',
         prPrice: ''
     });
-    const [message, setMessage] = useState({ type: '', content: '' });
+
+    // Danh sách các danh mục sản phẩm
+    const categories = [
+        'Sách văn học',
+        'Sách thiếu nhi',
+        'Sách kinh tế',
+        'Sách kỹ năng sống',
+        'Sách ngoại ngữ',
+        'Sách giáo khoa'
+    ];
 
     useEffect(() => {
-        let mounted = true;
+        fetchProducts();
+    }, []);
 
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                const response = await productApi.getAllProducts(currentPage, 10);
-                if (mounted && response?.status === 'OK') {
-                    if (Array.isArray(response.data.product)) {
-                        setProducts(response.data.product);
-                    } else {
-                        console.error('Invalid response structure:', response);
-                    }
-                    setTotalPages(response.data.pagination.totalPages);
-                }
-            } catch (error) {
-                if (mounted) {
-                    console.error('Lỗi khi tải danh sách sản phẩm:', error);
-                    setProducts([]);
-                    showMessage('error', 'Không thể tải danh sách sản phẩm');
-                }
-            } finally {
-                if (mounted) {
-                    setLoading(false);
-                }
+    const fetchProducts = async () => {
+        try {
+            setLoading(true);
+            const response = await productApi.getAllProduct();
+            if (response.status === 'OK') {
+                setProducts(response.data);
+            } else {
+                toast.error('Lỗi khi tải danh sách sản phẩm');
             }
-        };
-
-        fetchData();
-
-        return () => {
-            mounted = false;
-        };
-    }, [currentPage]);
+        } catch (error) {
+            toast.error('Không thể kết nối đến server');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -62,43 +59,61 @@ const ManageProducts = () => {
         }));
     };
 
-    const resetForm = () => {
-        setFormData({
-            prTitle: '',
-            prAuthor: '',
-            prCategory: '',
-            prStockquanlity: '',
-            prPrice: ''
-        });
-        setEditingProduct(null);
-    };
-
-    const showMessage = (type, content) => {
-        setMessage({ type, content });
-        // Tự động ẩn thông báo sau 3 giây
-        setTimeout(() => {
-            setMessage({ type: '', content: '' });
-        }, 3000);
+    const validateForm = () => {
+        if (!formData.prTitle.trim()) return 'Vui lòng nhập tên sản phẩm';
+        if (!formData.prAuthor.trim()) return 'Vui lòng nhập tên tác giả';
+        if (!formData.prCategory) return 'Vui lòng chọn danh mục';
+        if (!formData.prImage.trim()) return 'Vui lòng nhập URL hình ảnh';
+        if (!formData.prPrice || formData.prPrice <= 0) return 'Vui lòng nhập giá hợp lệ';
+        if (!formData.prStockQuanlity || formData.prStockQuanlity < 0) return 'Vui lòng nhập số lượng hợp lệ';
+        return null;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const error = validateForm();
+        if (error) {
+            toast.error(error);
+            return;
+        }
+
         try {
-            let response;
-            if (editingProduct) {
-                response = await productApi.updateProduct(editingProduct.prId, formData);
-            } else {
-                response = await productApi.createProduct(formData);
-            }
+            setLoading(true);
+            const response = editingProduct
+                ? await productApi.updateProduct(editingProduct.prId, formData)
+                : await productApi.createProduct(formData);
 
             if (response.status === 'OK') {
-                showMessage('success', editingProduct ? 'Cập nhật sản phẩm thành công!' : 'Thêm sản phẩm thành công!');
+                toast.success(editingProduct ? 'Cập nhật thành công' : 'Thêm mới thành công');
                 setShowForm(false);
                 resetForm();
                 fetchProducts();
+            } else {
+                toast.error(response.message);
             }
         } catch (error) {
-            showMessage('error', error.response?.data?.message || 'Có lỗi xảy ra khi xử lý yêu cầu');
+            toast.error('Có lỗi xảy ra khi xử lý yêu cầu');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = async (productId) => {
+        if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
+            try {
+                setLoading(true);
+                const response = await productApi.deleteProduct(productId);
+                if (response.status === 'OK') {
+                    toast.success('Xóa sản phẩm thành công');
+                    fetchProducts();
+                } else {
+                    toast.error(response.message);
+                }
+            } catch (error) {
+                toast.error('Có lỗi xảy ra khi xóa sản phẩm');
+            } finally {
+                setLoading(false);
+            }
         }
     };
 
@@ -108,299 +123,263 @@ const ManageProducts = () => {
             prTitle: product.prTitle,
             prAuthor: product.prAuthor,
             prCategory: product.prCategory,
-            prStockquanlity: product.prStockquanlity,
+            prDescription: product.prDescription || '',
+            prImage: product.prImage,
+            prStockQuanlity: product.prStockQuanlity,
             prPrice: product.prPrice
         });
         setShowForm(true);
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
-            try {
-                const response = await productApi.deleteProduct(id);
-                if (response.status === 'OK') {
-                    showMessage('success', 'Xóa sản phẩm thành công!');
-                    fetchProducts();
-                }
-            } catch (error) {
-                showMessage('error', 'Có lỗi xảy ra khi xóa sản phẩm');
-            }
-        }
+    const resetForm = () => {
+        setFormData({
+            prTitle: '',
+            prAuthor: '',
+            prCategory: '',
+            prDescription: '',
+            prImage: '',
+            prStockQuanlity: '',
+            prPrice: ''
+        });
+        setEditingProduct(null);
     };
 
-    const renderPagination = () => {
-        return (
-            <div className="flex justify-center mt-6">
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                        <button
-                            key={page}
-                            onClick={() => setCurrentPage(page)}
-                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium
-                                ${currentPage === page
-                                    ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
-                                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                                }`}
-                        >
-                            {page}
-                        </button>
-                    ))}
-                </nav>
-            </div>
-        );
-    };
+    const filteredProducts = products.filter(product =>
+        product.prTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.prAuthor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.prCategory.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
-    const fetchProducts = async () => {
-        try {
-            setLoading(true);
-            const response = await productApi.getAllProducts(currentPage, 10);
-            console.log('API Response:', response);
-
-            if (response?.status === 'OK' && Array.isArray(response.data.product)) {
-                setProducts(response.data.product);
-                setTotalPages(response.data.pagination.totalPages);
-            } else {
-                console.error('Invalid response structure:', response);
-                setProducts([]);
-            }
-        } catch (error) {
-            console.error('Lỗi khi tải danh sách sản phẩm:', error);
-            setProducts([]);
-            showMessage('error', 'Không thể tải danh sách sản phẩm');
-        } finally {
-            setLoading(false);
-        }
-    };
+    if (loading) return <LoadingSpinner />;
 
     return (
         <div className="min-h-screen bg-gray-100">
             <AdminNavbar />
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {message.content && (
-                    <div className={`mb-4 p-4 rounded-md ${message.type === 'success'
-                        ? 'bg-green-50 text-green-800'
-                        : 'bg-red-50 text-red-800'
-                        }`}>
-                        {message.content}
-                    </div>
-                )}
+            <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                {/* Header */}
+                <div className="mb-6">
+                    <h1 className="text-3xl font-bold text-gray-900">Quản lý sản phẩm</h1>
+                    <p className="mt-2 text-sm text-gray-600">Quản lý và cập nhật thông tin sản phẩm</p>
+                </div>
 
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-semibold text-gray-900">Quản lý sản phẩm</h1>
+                {/* Search and Add */}
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                    <div className="relative w-full sm:w-96">
+                        <input
+                            type="text"
+                            placeholder="Tìm kiếm sản phẩm..."
+                            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-indigo-500"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <FaSearch className="absolute left-3 top-3 text-gray-400" />
+                    </div>
                     <button
                         onClick={() => {
                             resetForm();
-                            setShowForm(!showForm);
+                            setShowForm(true);
                         }}
-                        className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                        className="w-full sm:w-auto bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"
                     >
-                        <FaPlus className="-ml-1 mr-2 h-5 w-5" />
-                        Thêm sản phẩm
+                        <FaPlus /> Thêm sản phẩm
                     </button>
                 </div>
 
-                {showForm && (
-                    <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6 mb-6">
-                        <div className="grid grid-cols-6 gap-6">
-                            <div className="col-span-6 sm:col-span-3">
-                                <label htmlFor="prTitle" className="block text-sm font-medium text-gray-700">
-                                    Tên sách
-                                </label>
-                                <input
-                                    type="text"
-                                    name="prTitle"
-                                    id="prTitle"
-                                    value={formData.prTitle}
-                                    onChange={handleInputChange}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 [&::placeholder]:text-gray-400"
-                                    placeholder="Nhập tên sản phẩm"
-                                    required
-                                />
-                            </div>
-
-                            <div className="col-span-6 sm:col-span-3">
-                                <label htmlFor="prAuthor" className="block text-sm font-medium text-gray-700">
-                                    Tác giả
-                                </label>
-                                <input
-                                    type="text"
-                                    name="prAuthor"
-                                    id="prAuthor"
-                                    value={formData.prAuthor}
-                                    onChange={handleInputChange}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 [&::placeholder]:text-gray-400"
-                                    placeholder="Nhập tên tác giả"
-                                    required
-                                />
-                            </div>
-
-                            <div className="col-span-6 sm:col-span-3">
-                                <label htmlFor="prCategory" className="block text-sm font-medium text-gray-700">
+                {/* Products List */}
+                <div className="bg-white shadow-md rounded-lg overflow-hidden">
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Sản phẩm
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Danh mục
-                                </label>
-                                <input
-                                    type="text"
-                                    name="prCategory"
-                                    id="prCategory"
-                                    value={formData.prCategory}
-                                    onChange={handleInputChange}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 [&::placeholder]:text-gray-400"
-                                    placeholder="Nhập danh mục"
-                                    required
-                                />
-
-                            </div>
-
-                            <div className="col-span-6 sm:col-span-3">
-                                <label htmlFor="prStockquanlity" className="block text-sm font-medium text-gray-700">
-                                    Số lượng
-                                </label>
-                                <input
-                                    type="number"
-                                    name="prStockquanlity"
-                                    id="prStockquanlity"
-                                    value={formData.prStockquanlity}
-                                    onChange={handleInputChange}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 [&::placeholder]:text-gray-400"
-                                    placeholder="Nhập số lượng"
-                                    required
-                                />
-                            </div>
-
-                            <div className="col-span-6 sm:col-span-3">
-                                <label htmlFor="prPrice" className="block text-sm font-medium text-gray-700">
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Giá
-                                </label>
-                                <input
-                                    type="number"
-                                    name="prPrice"
-                                    id="prPrice"
-                                    value={formData.prPrice}
-                                    onChange={handleInputChange}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 [&::placeholder]:text-gray-400"
-                                    placeholder="Nhập giá"
-                                    required
-                                />
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Số lượng
+                                </th>
+                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Thao tác
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {filteredProducts.map((product) => (
+                                <tr key={product.prId} className="hover:bg-gray-50">
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="flex items-center">
+                                            <div className="h-16 w-16 flex-shrink-0">
+                                                <img
+                                                    className="h-16 w-16 object-cover rounded"
+                                                    src={product.prImage}
+                                                    alt={product.prTitle}
+                                                />
+                                            </div>
+                                            <div className="ml-4">
+                                                <div className="text-sm font-medium text-gray-900">
+                                                    {product.prTitle}
+                                                </div>
+                                                <div className="text-sm text-gray-500">
+                                                    {product.prAuthor}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                            {product.prCategory}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        {new Intl.NumberFormat('vi-VN', {
+                                            style: 'currency',
+                                            currency: 'VND'
+                                        }).format(product.prPrice)}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        {product.prStockQuanlity}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button
+                                            onClick={() => handleEdit(product)}
+                                            className="text-indigo-600 hover:text-indigo-900 mr-4"
+                                        >
+                                            <FaEdit className="inline-block w-5 h-5" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(product.prId)}
+                                            className="text-red-600 hover:text-red-900"
+                                        >
+                                            <FaTrash className="inline-block w-5 h-5" />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Form Modal */}
+                {showForm && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                        <div className="bg-white rounded-lg w-full max-w-2xl">
+                            <div className="p-6">
+                                <h2 className="text-2xl font-bold mb-4">
+                                    {editingProduct ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm mới'}
+                                </h2>
+                                <form onSubmit={handleSubmit} className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Tên sách</label>
+                                            <input
+                                                type="text"
+                                                name="prTitle"
+                                                value={formData.prTitle}
+                                                onChange={handleInputChange}
+                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Tác giả</label>
+                                            <input
+                                                type="text"
+                                                name="prAuthor"
+                                                value={formData.prAuthor}
+                                                onChange={handleInputChange}
+                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Danh mục</label>
+                                            <select
+                                                name="prCategory"
+                                                value={formData.prCategory}
+                                                onChange={handleInputChange}
+                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                required
+                                            >
+                                                <option value="">Chọn danh mục</option>
+                                                {categories.map(category => (
+                                                    <option key={category} value={category}>{category}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">URL Hình ảnh</label>
+                                            <input
+                                                type="text"
+                                                name="prImage"
+                                                value={formData.prImage}
+                                                onChange={handleInputChange}
+                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Giá</label>
+                                            <input
+                                                type="number"
+                                                name="prPrice"
+                                                value={formData.prPrice}
+                                                onChange={handleInputChange}
+                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                min="0"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Số lượng</label>
+                                            <input
+                                                type="number"
+                                                name="prStockQuanlity"
+                                                value={formData.prStockQuanlity}
+                                                onChange={handleInputChange}
+                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                min="0"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Mô tả</label>
+                                        <textarea
+                                            name="prDescription"
+                                            value={formData.prDescription}
+                                            onChange={handleInputChange}
+                                            rows="3"
+                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        />
+                                    </div>
+                                    <div className="flex justify-end gap-4 mt-6">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setShowForm(false);
+                                                resetForm();
+                                            }}
+                                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                                        >
+                                            Hủy
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+                                            disabled={loading}
+                                        >
+                                            {loading ? 'Đang xử lý...' : (editingProduct ? 'Cập nhật' : 'Thêm mới')}
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-                        <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setShowForm(false);
-                                    resetForm();
-                                }}
-                                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-                            >
-                                Hủy
-                            </button>
-                            <button
-                                type="submit"
-                                className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-                            >
-                                {editingProduct ? 'Cập nhật' : 'Thêm mới'}
-                            </button>
-                        </div>
-                    </form>
-                )}
-
-                {loading ? (
-                    <div className="text-center py-4">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-                    </div>
-                ) : (
-                    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Tên sách
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Tác giả
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Danh mục
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Số lượng
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Giá
-                                    </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Thao tác
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {products && products.length > 0 ? (
-                                    products.map((product) => (
-                                        <tr key={product.prId} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex items-center">
-                                                    <div className="h-10 w-10 flex-shrink-0">
-                                                        <img
-                                                            className="h-10 w-10 rounded-full object-cover"
-                                                            src={product.prImage || '/placeholder.png'}
-                                                            alt={product.prTitle}
-                                                        />
-                                                    </div>
-                                                    <div className="ml-4">
-                                                        <div className="text-sm font-medium text-gray-900">
-                                                            {product.prTitle}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{product.prAuthor}</div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                                    {product.prCategory}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {product.prStockquanlity}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {new Intl.NumberFormat('vi-VN', {
-                                                    style: 'currency',
-                                                    currency: 'VND'
-                                                }).format(product.prPrice)}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <button
-                                                    onClick={() => handleEdit(product)}
-                                                    className="text-indigo-600 hover:text-indigo-900 mr-4"
-                                                    title="Sửa"
-                                                >
-                                                    <FaEdit className="w-5 h-5" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(product.prId)}
-                                                    className="text-red-600 hover:text-red-900"
-                                                    title="Xóa"
-                                                >
-                                                    <FaTrash className="w-5 h-5" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
-                                            Không có sản phẩm nào
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
                     </div>
                 )}
-
-                {renderPagination()}
             </div>
         </div>
     );
