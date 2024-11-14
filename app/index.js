@@ -30,8 +30,7 @@ app.use('/api/cart', CartRouter)
 
 app.use(errorHandler)
 
-
-async function startServer() {
+const startServer = async () => {
     try {
         await sequelize.authenticate();
         console.log('Kết nối tới SQL Server thành công!');
