@@ -4,7 +4,7 @@ import { FaPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/main/LoadingSpinner';
 import userApi from '../../api/userApi';
-
+import axios from 'axios';
 const ManageUsers = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -26,17 +26,12 @@ const ManageUsers = () => {
 
     const fetchUsers = async () => {
         try {
-            setLoading(true);
-            const response = await userApi.getAllUsers();
-            if (response.status === 'OK') {
-                setUsers(response.data);
-            } else {
-                toast.error('Lỗi khi tải danh sách người dùng');
+            const response = await axios.get('http://localhost:5000/api/user/all');
+            if (response.data.status === 'OK') {
+                setUsers(response.data.data);
             }
         } catch (error) {
-            toast.error('Không thể kết nối đến server');
-        } finally {
-            setLoading(false);
+            console.error('Lỗi khi lấy danh sách người dùng:', error);
         }
     };
 

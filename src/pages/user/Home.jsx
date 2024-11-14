@@ -14,7 +14,7 @@ const Home = () => {
     useEffect(() => {
         const fetchBooks = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/product/');
+                const response = await axios.get('http://localhost:5000/api/product/all');
 
                 if (response.data && typeof response.data === 'object') {
                     const productsData = Array.isArray(response.data)
@@ -83,13 +83,13 @@ const Home = () => {
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-5 gap-4">
-                                    {books.map(book => (
+                                    {books.map((book, index) => (
                                         <div
-                                            key={book.id}
+                                            key={`${book.id}-${index}`}
                                             onClick={() => navigate(`/product-detail/${book.id}`)}
                                             className="cursor-pointer"
                                         >
-                                            <ProductCard {...book} />
+                                            <ProductCard prId={book.id} prTitle={book.title} prImage={book.image} prAuthor={book.author} prPrice={book.price} prStockquanlity={book.stockQuantity} />
                                         </div>
                                     ))}
                                 </div>

@@ -4,6 +4,7 @@ import { FaPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../../components/main/LoadingSpinner';
 import productApi from '../../api/productApi';
+import axios from 'axios';
 
 const ManageProducts = () => {
     const [products, setProducts] = useState([]);
@@ -37,19 +38,16 @@ const ManageProducts = () => {
 
     const fetchProducts = async () => {
         try {
-            setLoading(true);
-            const response = await productApi.getAllProduct();
-            if (response.status === 'OK') {
-                setProducts(response.data);
-            } else {
-                toast.error('Lỗi khi tải danh sách sản phẩm');
+            const response = await axios.get('http://localhost:5000/api/product/all');
+            if (response.data.status === 'OK') {
+                setProducts(response.data.data);
             }
         } catch (error) {
-            toast.error('Không thể kết nối đến server');
-        } finally {
-            setLoading(false);
+            console.error('Lỗi khi lấy danh sách sản phẩm:', error);
         }
     };
+
+    console.log('Products:', products);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -208,57 +206,73 @@ const ManageProducts = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {filteredProducts.map((product) => (
-                                <tr key={product.prId} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center">
-                                            <div className="h-16 w-16 flex-shrink-0">
-                                                <img
-                                                    className="h-16 w-16 object-cover rounded"
-                                                    src={product.prImage}
-                                                    alt={product.prTitle}
-                                                />
-                                            </div>
-                                            <div className="ml-4">
-                                                <div className="text-sm font-medium text-gray-900">
-                                                    {product.prTitle}
-                                                </div>
-                                                <div className="text-sm text-gray-500">
-                                                    {product.prAuthor}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                            {product.prCategory}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {new Intl.NumberFormat('vi-VN', {
-                                            style: 'currency',
-                                            currency: 'VND'
-                                        }).format(product.prPrice)}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {product.prStockQuanlity}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button
-                                            onClick={() => handleEdit(product)}
-                                            className="text-indigo-600 hover:text-indigo-900 mr-4"
-                                        >
-                                            <FaEdit className="inline-block w-5 h-5" />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(product.prId)}
-                                            className="text-red-600 hover:text-red-900"
-                                        >
-                                            <FaTrash className="inline-block w-5 h-5" />
-                                        </button>
+                            {products.length === 0 ? (
+                                <tr>
+                                    <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                                        Không có sản phẩm nào
                                     </td>
                                 </tr>
-                            ))}
+                            ) : (
+                                products.map((product) => (
+                                    <tr key={product.prId} className="hover:bg-gray-50">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center">
+                                                <div className="h-16 w-16 flex-shrink-0">
+                                                    <img
+                                                        className="h-16 w-16 object-cover rounded"
+                                                        src={product.prImage}
+                                                        alt={product.prTitle}
+                                                        onError={(e) => {
+                                                            e.target.src = '/placeholder-image.jpg'; // Ảnh mặc định khi lỗi
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div className="ml-4">
+                                                    <div className="text-sm font-medium text-gray-900 line-clamp-2">
+                                                        {product.prTitle}
+                                                    </div>
+                                                    <div className="text-sm text-gray-500">
+                                                        {product.prAuthor}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                                {product.prCategory}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-900">
+                                            {new Intl.NumberFormat('vi-VN', {
+                                                style: 'currency',
+                                                currency: 'VND'
+                                            }).format(product.prPrice)}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-900">
+                                            <span className={`${product.prStockQuanlity <= 10 ? 'text-red-600' : 'text-gray-900'
+                                                }`}>
+                                                {product.prStockQuanlity}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-right space-x-3">
+                                            <button
+                                                onClick={() => handleEdit(product)}
+                                                className="text-indigo-600 hover:text-indigo-900"
+                                                title="Sửa"
+                                            >
+                                                <FaEdit className="inline-block w-5 h-5" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(product.prId)}
+                                                className="text-red-600 hover:text-red-900"
+                                                title="Xóa"
+                                            >
+                                                <FaTrash className="inline-block w-5 h-5" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>

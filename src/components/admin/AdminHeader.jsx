@@ -1,10 +1,28 @@
 import React, { useState } from 'react';
 import { FaUser, FaBell, FaSignOutAlt } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const AdminHeader = () => {
+    const navigate = useNavigate();
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+
+    const handleLogout = () => {
+        try {
+            // Xóa token từ localStorage
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+
+            // Thông báo đăng xuất thành công
+            toast.success('Đăng xuất thành công');
+
+            // Chuyển hướng về trang chủ
+            navigate('/');
+        } catch (error) {
+            toast.error('Có lỗi xảy ra khi đăng xuất');
+        }
+    };
 
     return (
         <header className="bg-white border-b border-gray-200">
@@ -46,8 +64,11 @@ const AdminHeader = () => {
                                             <FaUser className="mr-2 text-gray-400" size={16} />
                                             Hồ sơ
                                         </Link>
-                                        <button className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md">
-                                            <FaSignOutAlt className="mr-2" size={16} />
+                                        <button
+                                            onClick={handleLogout}
+                                            className="flex items-center px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700"
+                                        >
+                                            <FaSignOutAlt className="mr-2" />
                                             Đăng xuất
                                         </button>
                                     </div>
