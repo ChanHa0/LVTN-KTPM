@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon app/index.js",
-    "generate-models": "node app/scripts/generateModels.js"
+    "generate-models": "node app/config/generateModels.js"
   },
   "author": "",
   "license": "ISC",

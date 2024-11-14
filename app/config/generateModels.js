@@ -1,5 +1,5 @@
 const SequelizeAuto = require('sequelize-auto');
-const { sequelize } = require('../config/connectDB');
+const { sequelize } = require('./connectDB');
 
 const auto = new SequelizeAuto(sequelize, null, null, {
     directory: './app/models',
