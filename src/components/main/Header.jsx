@@ -1,34 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaSearch, FaShoppingCart, FaUser } from 'react-icons/fa';
 import { useCart } from '../../contexts/CartContext';
-
-const TopHeader = () => (
-    <div className="bg-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-            <div className="grid grid-cols-12 items-center text-sm">
-                <div className="col-span-9 flex items-center gap-6">
-                    <Link to="/support" className="text-gray-600 hover:text-blue-500">
-                        Chăm sóc khách hàng
-                    </Link>
-                    <span className="text-gray-300">|</span>
-                    <Link to="/orders/track" className="text-gray-600 hover:text-blue-500">
-                        Kiểm tra đơn hàng
-                    </Link>
-                </div>
-                <div className="col-span-3 flex items-center justify-end gap-6">
-                    <Link to="/notifications" className="text-gray-600 hover:text-blue-500">
-                        Thông báo
-                    </Link>
-                    <span className="text-gray-300">|</span>
-                    <Link to="/help" className="text-gray-600 hover:text-blue-500">
-                        Trợ giúp
-                    </Link>
-                </div>
-            </div>
-        </div>
-    </div>
-);
 
 const SearchBar = () => (
     <div className="flex-1 max-w-3xl">
@@ -47,6 +20,7 @@ const SearchBar = () => (
 
 const UserMenu = ({ isMenuOpen, setIsMenuOpen }) => {
     const [user, setUser] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const userStr = localStorage.getItem('user');
@@ -66,25 +40,18 @@ const UserMenu = ({ isMenuOpen, setIsMenuOpen }) => {
         <div className="relative">
             <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-3 hover:bg-gray-100 rounded-full"
+                className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg"
             >
                 <FaUser className="text-blue-500" size={22} />
+                {user && <span className="text-sm font-medium text-gray-700">{user.name || 'User'}</span>}
             </button>
             {isMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 border border-gray-100 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
                     {user ? (
                         <>
                             <div className="px-4 py-2 text-gray-600 border-b border-gray-100">
                                 {user.email}
                             </div>
-                            {user.role === true && (
-                                <Link
-                                    to="/dashboard"
-                                    className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-500"
-                                >
-                                    Quản lý
-                                </Link>
-                            )}
                             <Link
                                 to="/profile"
                                 className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-500"
@@ -92,7 +59,7 @@ const UserMenu = ({ isMenuOpen, setIsMenuOpen }) => {
                                 Thông tin cá nhân
                             </Link>
                             <Link
-                                to="/orders"
+                                to="/my-orders"
                                 className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-blue-500"
                             >
                                 Đơn hàng của tôi
@@ -129,7 +96,7 @@ const UserMenu = ({ isMenuOpen, setIsMenuOpen }) => {
 const CartButton = ({ cartCount }) => (
     <div className="relative">
         <Link
-            to="/order"
+            to="/cart"
             className="inline-flex p-3 hover:bg-gray-100 rounded-full"
         >
             <FaShoppingCart className="text-blue-500" size={22} />
@@ -148,8 +115,6 @@ const Header = () => {
 
     return (
         <header className="w-full bg-white shadow-md">
-            <TopHeader />
-
             <div className="bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between gap-8">

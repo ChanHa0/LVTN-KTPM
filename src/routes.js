@@ -1,21 +1,20 @@
-import Home from "./pages/user/Home";
-import Register from "./pages/user/Register";
-import Login from "./pages/user/Login";
-import Profile from "./pages/user/Profile";
-import ProductDetail from "./pages/user/ProductDetail";
-import Product from "./pages/user/Product";
-import Search from "./pages/user/Search";
-import Order from "./pages/user/Order";
-import OrderDetail from "./pages/user/OrderDetail";
-import Payment from "./pages/user/Payment";
-import NotFound from "./pages/user/NotFound";
+import Home from "./pages/Home";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+import Profile from "./pages/Profile";
+import ProductDetail from "./pages/ProductDetail";
+import Product from "./pages/Product";
+import Order from "./pages/Order";
+import MyOrders from "./pages/MyOrders";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import NotFound from "./pages/NotFound";
 import MainLayout from "./components/main/MainLayout";
 import AuthLayout from "./components/main/AuthLayout";
-
-import Dashboard from './pages/admin/Dashboard';
-import ManageProducts from './pages/admin/ManageProducts';
-import ManageOrders from './pages/admin/ManageOrders';
-import ManageUsers from './pages/admin/ManageUsers';
+import Dashboard from './pages/Dashboard';
+import ManageProducts from './pages/ManageProducts';
+import ManageUsers from "./pages/ManageUsers";
+import ManageOrders from './pages/ManageOrders';
 import AdminLayout from './components/admin/AdminLayout';
 
 export const routes = [
@@ -40,24 +39,24 @@ export const routes = [
         element: <MainLayout><Product /></MainLayout>
     },
     {
-        path: '/product-detail',
+        path: '/product/:id',
         element: <MainLayout><ProductDetail /></MainLayout>
     },
     {
-        path: '/search',
-        element: <MainLayout><Search /></MainLayout>
+        path: '/cart',
+        element: <MainLayout><Cart /></MainLayout>
     },
     {
         path: '/order',
         element: <MainLayout><Order /></MainLayout>
     },
     {
-        path: '/order-detail',
-        element: <MainLayout><OrderDetail /></MainLayout>
+        path: '/my-orders',
+        element: <MainLayout><MyOrders /></MainLayout>
     },
     {
-        path: '/payment',
-        element: <MainLayout><Payment /></MainLayout>
+        path: '/checkout',
+        element: <MainLayout><Checkout /></MainLayout>
     },
     {
         path: '*',
@@ -72,11 +71,11 @@ export const routes = [
         element: <AdminLayout><ManageProducts /></AdminLayout>
     },
     {
+        path: '/manage-user',
+        element: <AdminLayout><ManageUsers /></AdminLayout>
+    },
+    {
         path: '/manage-order',
         element: <AdminLayout><ManageOrders /></AdminLayout>
     },
-    {
-        path: '/manage-user',
-        element: <AdminLayout><ManageUsers /></AdminLayout>
-    }
 ];
