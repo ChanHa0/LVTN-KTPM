@@ -1,6 +1,7 @@
 const ProductService = require('../services/ProductService');
 
 const ProductController = {
+    // Create product
     createProduct: async (req, res) => {
         try {
             const result = await ProductService.createProduct(req.body);
@@ -8,12 +9,11 @@ const ProductController = {
                 return res.status(400).json(result);
             }
             res.status(201).json(result);
-
         } catch (error) {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-
+    // Update product
     updateProduct: async (req, res) => {
         try {
             const { id } = req.params;
@@ -22,12 +22,11 @@ const ProductController = {
                 return res.status(404).json(result);
             }
             res.status(200).json(result);
-
         } catch (error) {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-
+    // Delete product
     deleteProduct: async (req, res) => {
         try {
             const { id } = req.params;
@@ -36,12 +35,11 @@ const ProductController = {
                 return res.status(404).json(result);
             }
             res.status(200).json(result);
-
         } catch (error) {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-
+    // Get all product
     getAllProduct: async (req, res) => {
         try {
             const result = await ProductService.getAllProduct();
@@ -49,12 +47,11 @@ const ProductController = {
                 return res.status(404).json(result);
             }
             res.status(200).json(result);
-
         } catch (error) {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-
+    // Get detail product
     getDetailProduct: async (req, res) => {
         try {
             const { id } = req.params;
@@ -63,12 +60,11 @@ const ProductController = {
                 return res.status(404).json(result);
             }
             res.status(200).json(result);
-
         } catch (error) {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-
+    // Search product
     searchProduct: async (req, res) => {
         try {
             const result = await ProductService.searchProduct(req.query);
@@ -76,7 +72,6 @@ const ProductController = {
                 return res.status(404).json(result);
             }
             res.status(200).json(result);
-
         } catch (error) {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }

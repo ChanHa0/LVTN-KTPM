@@ -1,19 +1,18 @@
-const { Product } = require('../models');
-const { Op } = require('sequelize');
+const Product = require('../models/product');
 
 const ProductService = {
     createProduct: async (productData) => {
-        const { prTitle, prAuthor, prCategory, prImage, prStockQuanlity, prDescription, prPrice } = productData;
+        const { prTitle, prAuthor, prCategory, prImage, prStockQuantity, prDescription, prPrice } = productData;
         try {
-            // Kiểm tra xem sản phẩm đã tồn tại 
-            const existingProduct = await Product.findOne({ where: { prTitle: prTitle } });
+            // Kiểm tra xem sản phẩm đã tồn tại
+            const existingProduct = await Product.findOne({ prTitle });
             if (existingProduct) {
                 return { status: 'ERR', message: 'Sản phẩm đã tồn tại' };
-            };
+            }
             // Kiểm tra tiêu đề
             if (!prTitle) {
                 return { status: 'ERR', message: 'Tiêu đề sản phẩm không được để trống' };
-            };
+            }
             // Tạo sản phẩm mới
             const newProduct = await Product.create({
                 prTitle,
@@ -21,25 +20,26 @@ const ProductService = {
                 prCategory,
                 prImage,
                 prDescription,
-                prStockQuanlity,
+                prStockQuantity,
                 prPrice
             });
             return { status: 'OK', message: 'Tạo sản phẩm thành công', data: newProduct };
 
         } catch (error) {
             return { status: 'ERR', message: 'Lỗi tạo sản phẩm', error: error.message };
-        };
+        }
     },
 
     updateProduct: async (id, productData) => {
         try {
-            // Kiểm tra xem sản phẩm có tồn tại 
-            const product = await Product.findByPk(id);
+            // Kiểm tra xem sản phẩm có tồn tại
+            const product = await Product.findById(id);
             if (!product) {
                 return { status: 'ERR', message: 'Sản phẩm không tồn tại' };
             }
             // Cập nhật sản phẩm
-            await product.update(productData);
+            Object.assign(product, productData);
+            await product.save();
             return { status: 'OK', message: 'Cập nhật sản phẩm thành công', data: product };
 
         } catch (error) {
@@ -49,13 +49,13 @@ const ProductService = {
 
     deleteProduct: async (id) => {
         try {
-            // Kiểm tra xem sản phẩm có tồn tại 
-            const product = await Product.findByPk(id);
+            // Kiểm tra xem sản phẩm có tồn tại
+            const product = await Product.findById(id);
             if (!product) {
                 return { status: 'ERR', message: 'Sản phẩm không tồn tại' };
             }
             // Xóa sản phẩm
-            await product.destroy();
+            await Product.findByIdAndDelete(id);
             return { status: 'OK', message: 'Xóa sản phẩm thành công' };
 
         } catch (error) {
@@ -65,9 +65,9 @@ const ProductService = {
 
     getAllProduct: async () => {
         try {
-            // Lấy tất cả sản phẩm mà không cần phân trang
-            const product = await Product.findAll();
-            return { status: 'OK', message: 'Lấy danh sách sản phẩm thành công', data: product };
+            // Lấy tất cả sản phẩm
+            const products = await Product.find();
+            return { status: 'OK', message: 'Lấy danh sách sản phẩm thành công', data: products };
 
         } catch (error) {
             return { status: 'ERR', message: 'Lỗi lấy danh sách sản phẩm', error: error.message };
@@ -76,7 +76,7 @@ const ProductService = {
 
     getDetailProduct: async (id) => {
         try {
-            const product = await Product.findByPk(id);
+            const product = await Product.findById(id);
             if (!product) {
                 return { status: 'ERR', message: 'Sản phẩm không tồn tại' };
             }
@@ -90,63 +90,60 @@ const ProductService = {
     searchProducts: async (query) => {
         try {
             const { keyword, category, minPrice, maxPrice, sort, page = 1, limit = 12 } = query;
-            const offset = (page - 1) * limit;
+            const skip = (page - 1) * limit;
             // Xây dựng điều kiện tìm kiếm
-            let whereClause = {};
+            let filter = {};
             // Tìm theo từ khóa
             if (keyword) {
-                whereClause = {
-                    [Op.or]: [
-                        { prTitle: { [Op.like]: `%${keyword}%` } },
-                        { prAuthor: { [Op.like]: `%${keyword}%` } },
-                        { prDescription: { [Op.like]: `%${keyword}%` } }
-                    ]
-                };
+                filter.$or = [
+                    { prTitle: { $regex: keyword, $options: 'i' } },
+                    { prAuthor: { $regex: keyword, $options: 'i' } },
+                    { prDescription: { $regex: keyword, $options: 'i' } }
+                ];
             }
             // Lọc theo danh mục
             if (category) {
-                whereClause.prCategory = category;
+                filter.prCategory = category;
             }
-
             // Lọc theo giá
             if (minPrice || maxPrice) {
-                whereClause.prPrice = {};
-                if (minPrice) whereClause.prPrice[Op.gte] = minPrice;
-                if (maxPrice) whereClause.prPrice[Op.lte] = maxPrice;
+                filter.prPrice = {};
+                if (minPrice) filter.prPrice.$gte = minPrice;
+                if (maxPrice) filter.prPrice.$lte = maxPrice;
             }
             // Xây dựng điều kiện sắp xếp
-            let order = [];
+            let sortOption = {};
             if (sort) {
                 switch (sort) {
                     case 'price_asc':
-                        order.push(['prPrice', 'ASC']);
+                        sortOption.prPrice = 1;
                         break;
                     case 'price_desc':
-                        order.push(['prPrice', 'DESC']);
+                        sortOption.prPrice = -1;
                         break;
                     case 'newest':
-                        order.push(['createdAt', 'DESC']);
+                        sortOption.createdAt = -1;
                         break;
                 }
             }
             // Thực hiện truy vấn
-            const products = await Product.findAndCountAll({
-                where: whereClause,
-                order: order,
-                offset: offset,
-                limit: parseInt(limit)
-            });
+            const products = await Product.find(filter)
+                .sort(sortOption)
+                .skip(skip)
+                .limit(parseInt(limit));
+
+            const total = await Product.countDocuments(filter);
 
             return {
                 status: 'OK',
                 message: 'Tìm kiếm sản phẩm thành công',
                 data: {
-                    products: products.rows,
+                    products,
                     pagination: {
-                        total: products.count,
+                        total,
                         page: parseInt(page),
                         limit: parseInt(limit),
-                        totalPages: Math.ceil(products.count / limit)
+                        totalPages: Math.ceil(total / limit)
                     }
                 }
             };

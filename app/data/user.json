@@ -1,8 +1,8 @@
 {
-    "uName": "admin",
-    "uPassword": "admin",
-    "uEmail": "admin@gmail.com",
-    "uAddress": "Hà Nội",
-    "uPhone": "0987654321",
-    "uIsadmin": true
+    "uName": "Nguyen Van A",
+    "uPassword": "123456789",
+    "uEmail": "admin123@gmail.com",
+    "uAddress": "123 Đường ABC, Quận 1, TP. Hồ Chí Minh",
+    "uPhone": "0123456789",
+    "uRole": "ADMIN"
 }

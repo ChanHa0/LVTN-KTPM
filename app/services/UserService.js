@@ -1,16 +1,16 @@
-const { User } = require('../models');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
 const UserService = {
     registerUser: async (userData) => {
-        const { uName, uEmail, uPassword } = userData;
+        const { uName, uEmail, uPassword, uAddress, uPhone } = userData;
         try {
             // Kiểm tra email tồn tại
-            const existingUser = await User.findOne({ where: { uEmail: uEmail } });
+            const existingUser = await User.findOne({ uEmail });
             if (existingUser) {
                 return { status: 'ERR', message: 'Email đã được sử dụng' };
-            };
+            }
             // Hash password
             const hashedPassword = await bcrypt.hash(uPassword, 10);
             // Tạo user mới
@@ -18,19 +18,21 @@ const UserService = {
                 uName,
                 uEmail,
                 uPassword: hashedPassword,
-                uIsadmin: false,
+                uAddress,
+                uPhone,
+                uRole: 'USER',
             });
             return { status: 'OK', message: 'Đăng ký thành công', data: newUser };
 
         } catch (error) {
             return { status: 'ERR', message: 'Lỗi đăng ký người dùng', error: error.message };
-        };
+        }
     },
 
     updateUser: async (id, userData) => {
         try {
             // Tìm người dùng theo id
-            const user = await User.findByPk(id);
+            const user = await User.findById(id);
             if (!user) {
                 return { status: 'ERR', message: 'Không tìm thấy người dùng' };
             }
@@ -39,46 +41,45 @@ const UserService = {
                 userData.uPassword = await bcrypt.hash(userData.uPassword, 10);
             }
             // Cập nhật thông tin người dùng
-            await user.update(userData);
-            // Cập nhật thành công
+            Object.assign(user, userData);
+            await user.save();
             return { status: 'OK', message: 'Cập nhật thông tin thành công', data: user };
 
         } catch (error) {
             return { status: 'ERR', message: 'Lỗi cập nhật thông tin', error: error.message };
-        };
+        }
     },
 
     deleteUser: async (id) => {
         try {
             // Tìm người dùng theo id
-            const user = await User.findByPk(id);
+            const user = await User.findById(id);
             if (!user) {
                 return { status: 'ERR', message: 'Không tìm thấy người dùng' };
             }
             // Xóa người dùng
-            await user.destroy();
+            await User.findByIdAndDelete(id);
             return { status: 'OK', message: 'Xóa người dùng thành công' };
 
         } catch (error) {
             return { status: 'ERR', message: 'Lỗi xóa người dùng', error: error.message };
-        };
+        }
     },
 
     getAllUser: async () => {
         try {
-
-            // Lấy danh sách người dùng 
-            const user = await User.findAll();
-            return { status: 'OK', message: 'Lấy danh sách người dùng thành công', data: user };
+            // Lấy danh sách người dùng
+            const users = await User.find();
+            return { status: 'OK', message: 'Lấy danh sách người dùng thành công', data: users };
 
         } catch (error) {
             return { status: 'ERR', message: 'Lỗi lấy danh sách người dùng', error: error.message };
-        };
+        }
     },
 
     getDetailUser: async (id) => {
         try {
-            const user = await User.findByPk(id);
+            const user = await User.findById(id);
             if (!user) {
                 return { status: 'ERR', message: 'Không tìm thấy người dùng' };
             }
@@ -86,13 +87,13 @@ const UserService = {
 
         } catch (error) {
             return { status: 'ERR', message: 'Lỗi lấy chi tiết người dùng', error: error.message };
-        };
+        }
     },
 
     loginUser: async (userData) => {
         try {
             const { uEmail, uPassword } = userData;
-            const user = await User.findOne({ where: { uEmail: uEmail } });
+            const user = await User.findOne({ uEmail });
 
             if (!user) {
                 return { status: 'ERR', message: 'Email không tồn tại' };
@@ -105,9 +106,9 @@ const UserService = {
 
             const token = jwt.sign(
                 {
-                    id: user.uId,
+                    id: user._id,
                     email: user.uEmail,
-                    role: user.uIsadmin
+                    role: user.uRole
                 },
                 process.env.JWT_SECRET || 'your-secret-key',
                 { expiresIn: '24h' }
@@ -116,7 +117,7 @@ const UserService = {
 
         } catch (error) {
             return { status: 'ERR', message: 'Lỗi đăng nhập', error: error.message };
-        };
+        }
     },
 };
 

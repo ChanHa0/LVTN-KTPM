@@ -1,20 +1,10 @@
 {
-    "cId": 1,
-    "uId": 1,
+    "prId": "64f1b2c9f1a4e2b3c4d5e6f9",
+    "uId": "64f1b2c9f1a4e2b3c4d5e6f7",
     "cStatus": "active",
-    "cartDetails": [
-        {
-            "cdId": 1,
-            "cId": 1,
-            "prId": 1,
-            "cdQuantity": 2,
-            "cdTotalprice": 200000,
-            "product": {
-                "prId": 1,
-                "prName": "Áo thun nam",
-                "prPrice": 100000,
-                "prImage": "path/to/image1.jpg"
-            }
-        }
-    ]
+    "cQuantity": 1,
+    "cPrice": 500000,
+    "COrderTime": "2023-10-01T12:00:00Z",
+    "cOrdered": false,
+    "cPayment": "COD"
 }

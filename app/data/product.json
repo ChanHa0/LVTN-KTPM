@@ -1,9 +1,9 @@
 {
-    "prTitle": "Sách 1",
-    "prAuthor": "Tác giả 1",
-    "prCategory": "Thể loại 1",
-    "prImage": "Ảnh 1",
-    "prDescription": "Mô tả 1",
-    "prStockQuanlity": 10,
-    "prPrice": 100000
+    "prTitle": "Lập Trình JavaScript Cơ Bản",
+    "prAuthor": "Nguyễn Văn B",
+    "prImage": "https://example.com/images/javascript-book.jpg",
+    "prDescription": "Cuốn sách này cung cấp kiến thức cơ bản về lập trình JavaScript, từ cú pháp đến các khái niệm nâng cao.",
+    "prCategory": "Programming",
+    "prStockQuantity": 100,
+    "prPrice": 250000
 }

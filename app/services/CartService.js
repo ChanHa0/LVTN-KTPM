@@ -1,87 +1,51 @@
-const { Cart, Product, User, CartDetail } = require('../models');
+const Cart = require('../models/cart');
+const Product = require('../models/product');
+const User = require('../models/user');
 
 const CartService = {
     addToCart: async (cartData) => {
         try {
-            const { U_ID, PR_ID, CD_QUANTITY } = cartData;
+            const { uId, prId, cQuantity } = cartData;
 
             // Kiểm tra user có tồn tại
-            const user = await User.findByPk(U_ID);
+            const user = await User.findById(uId);
             if (!user) {
                 return { status: 'ERR', message: 'Người dùng không tồn tại' };
             }
 
             // Kiểm tra sản phẩm có tồn tại và còn hàng
-            const product = await Product.findByPk(PR_ID);
+            const product = await Product.findById(prId);
             if (!product) {
                 return { status: 'ERR', message: 'Sản phẩm không tồn tại' };
             }
-            if (product.prStockQuanlity < CD_QUANTITY) {
+            if (product.prStockQuantity < cQuantity) {
                 return {
                     status: 'ERR',
                     message: 'Số lượng sản phẩm trong kho không đủ',
-                    available: product.prStockQuanlity
+                    available: product.prStockQuantity
                 };
             }
 
             // Tìm hoặc tạo giỏ hàng cho user
-            const [cart] = await Cart.findOrCreate({
-                where: {
-                    uId: U_ID,
-                    cStatus: 'active'
-                },
-                defaults: {
-                    uId: U_ID,
+            let cart = await Cart.findOne({ uId: uId, cStatus: 'active' });
+            if (!cart) {
+                cart = await Cart.create({
+                    uId: uId,
                     cStatus: 'active',
-                    cTotalprice: 0 // Thêm tổng giá trị giỏ hàng
-                }
-            });
-
-            // Xử lý chi tiết giỏ hàng
-            let cartDetail = await CartDetail.findOne({
-                where: {
-                    cId: cart.cId,
-                    prId: PR_ID
-                }
-            });
-
-            const itemPrice = product.prPrice;
-            if (cartDetail) {
-                // Cập nhật số lượng nếu sản phẩm đã có trong giỏ
-                const newQuantity = cartDetail.cdQuantity + CD_QUANTITY;
-                const newTotalPrice = newQuantity * itemPrice;
-
-                await cartDetail.update({
-                    cdQuantity: newQuantity,
-                    cdTotalprice: newTotalPrice
-                });
-            } else {
-                // Tạo mới nếu sản phẩm chưa có trong giỏ
-                cartDetail = await CartDetail.create({
-                    cId: cart.cId,
-                    prId: PR_ID,
-                    cdQuantity: CD_QUANTITY,
-                    cdTotalprice: CD_QUANTITY * itemPrice
+                    cQuantity: 0,
+                    cPrice: 0
                 });
             }
 
-            // Cập nhật tổng giá trị giỏ hàng
-            const allCartDetails = await CartDetail.findAll({
-                where: { cId: cart.cId }
-            });
-            const cartTotal = allCartDetails.reduce((sum, detail) => sum + detail.cdTotalprice, 0);
-            await cart.update({ cTotalprice: cartTotal });
+            // Cập nhật giỏ hàng
+            cart.cQuantity += cQuantity;
+            cart.cPrice += product.prPrice * cQuantity;
+            await cart.save();
 
             return {
                 status: 'OK',
                 message: 'Thêm sản phẩm vào giỏ hàng thành công',
-                data: {
-                    cart: {
-                        ...cart.dataValues,
-                        totalPrice: cartTotal
-                    },
-                    cartDetail
-                }
+                data: cart
             };
 
         } catch (error) {
@@ -96,47 +60,33 @@ const CartService = {
 
     editToCart: async (id, cartData) => {
         try {
-            const { CD_QUANTITY } = cartData;
+            const { cQuantity } = cartData;
 
-            // Kiểm tra chi tiết giỏ hàng
-            const cartDetail = await CartDetail.findByPk(id, {
-                include: [{ model: Cart }]
-            });
-            if (!cartDetail) {
-                return { status: 'ERR', message: 'Không tìm thấy sản phẩm trong giỏ hàng' };
+            // Kiểm tra giỏ hàng
+            const cart = await Cart.findById(id);
+            if (!cart) {
+                return { status: 'ERR', message: 'Không tìm thấy giỏ hàng' };
             }
 
-            // Kiểm tra số lượng tồn kho
-            const product = await Product.findByPk(cartDetail.prId);
-            if (product.prStockQuanlity < CD_QUANTITY) {
+            // Kiểm tra sản phẩm có tồn tại và còn hàng
+            const product = await Product.findById(cart.prId);
+            if (product.prStockQuantity < cQuantity) {
                 return {
                     status: 'ERR',
                     message: 'Số lượng sản phẩm trong kho không đủ',
-                    available: product.prStockQuanlity
+                    available: product.prStockQuantity
                 };
             }
 
-            // Cập nhật chi tiết giỏ hàng
-            const newTotalPrice = CD_QUANTITY * product.prPrice;
-            await cartDetail.update({
-                cdQuantity: CD_QUANTITY,
-                cdTotalprice: newTotalPrice
-            });
-
-            // Cập nhật tổng giá trị giỏ hàng
-            const allCartDetails = await CartDetail.findAll({
-                where: { cId: cartDetail.cId }
-            });
-            const cartTotal = allCartDetails.reduce((sum, detail) => sum + detail.cdTotalprice, 0);
-            await cartDetail.Cart.update({ cTotalprice: cartTotal });
+            // Cập nhật giỏ hàng
+            cart.cQuantity = cQuantity;
+            cart.cPrice = product.prPrice * cQuantity;
+            await cart.save();
 
             return {
                 status: 'OK',
                 message: 'Cập nhật giỏ hàng thành công',
-                data: {
-                    cartDetail,
-                    cartTotal
-                }
+                data: cart
             };
         } catch (error) {
             console.error('Lỗi editToCart:', error);
@@ -148,29 +98,39 @@ const CartService = {
         }
     },
 
+    deleteToCart: async (id) => {
+        try {
+            const cart = await Cart.findById(id);
+
+            if (!cart) {
+                return {
+                    status: 'ERR',
+                    message: 'Không tìm thấy giỏ hàng'
+                };
+            }
+
+            await cart.remove();
+
+            return {
+                status: 'OK',
+                message: 'Xóa sản phẩm khỏi giỏ hàng thành công'
+            };
+        } catch (error) {
+            console.error('Lỗi deleteToCart:', error);
+            return {
+                status: 'ERR',
+                message: 'Lỗi khi xóa sản phẩm khỏi giỏ hàng',
+                error: error.message
+            };
+        }
+    },
+
     getCart: async (userId) => {
         try {
             const cart = await Cart.findOne({
-                where: {
-                    uId: userId,
-                    cStatus: 'active'
-                },
-                include: [{
-                    model: CartDetail,
-                    include: [{
-                        model: Product,
-                        attributes: [
-                            'prId',
-                            'prTitle',
-                            'prAuthor',
-                            'prPrice',
-                            'prImage',
-                            'prStockQuanlity'
-                        ]
-                    }]
-                }],
-                order: [[CartDetail, 'createdAt', 'DESC']]
-            });
+                uId: userId,
+                cStatus: 'active'
+            }).populate('prId');
 
             if (!cart) {
                 return {
@@ -194,44 +154,6 @@ const CartService = {
             };
         }
     },
-
-    deleteToCart: async (id) => {
-        try {
-            const cartDetail = await CartDetail.findByPk(id, {
-                include: [{ model: Cart }]
-            });
-
-            if (!cartDetail) {
-                return {
-                    status: 'ERR',
-                    message: 'Không tìm thấy sản phẩm trong giỏ hàng'
-                };
-            }
-
-            const cartId = cartDetail.cId;
-            await cartDetail.destroy();
-
-            // Cập nhật tổng giá trị giỏ hàng
-            const remainingDetails = await CartDetail.findAll({
-                where: { cId: cartId }
-            });
-            const newTotal = remainingDetails.reduce((sum, detail) => sum + detail.cdTotalprice, 0);
-            await cartDetail.Cart.update({ cTotalprice: newTotal });
-
-            return {
-                status: 'OK',
-                message: 'Xóa sản phẩm khỏi giỏ hàng thành công',
-                data: { cartTotal: newTotal }
-            };
-        } catch (error) {
-            console.error('Lỗi deleteToCart:', error);
-            return {
-                status: 'ERR',
-                message: 'Lỗi khi xóa sản phẩm khỏi giỏ hàng',
-                error: error.message
-            };
-        }
-    }
 };
 
 module.exports = CartService;

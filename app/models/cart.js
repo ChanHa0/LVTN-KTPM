@@ -1,46 +1,43 @@
-const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Cart', {
-    cId: {
-      autoIncrement: true,
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      field: 'C_ID'
-    },
-    uId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'USER',
-        key: 'U_ID'
-      },
-      field: 'U_ID'
-    },
-    cStatus: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-      field: 'C_STATUS'
-    }
-  }, {
-    sequelize,
-    tableName: 'CART',
-    schema: 'dbo',
-    timestamps: false,
-    indexes: [
-      {
-        name: "PK_CART",
-        unique: true,
-        fields: [
-          { name: "C_ID" },
-        ]
-      },
-      {
-        name: "RELATIONSHIP_1_FK",
-        fields: [
-          { name: "U_ID" },
-        ]
-      },
-    ]
-  });
-};
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema
+
+const cartSchema = new mongoose.Schema({
+  prId: {
+    type: Schema.Types.ObjectId,
+    ref: "Product",
+  },
+  uId: {
+    type: Schema.Types.ObjectId,
+    ref: "User"
+  },
+  cStatus: {
+    type: String,
+    required: true
+  },
+  cQuantity: {
+    type: Number,
+    required: true,
+  },
+  cPrice: {
+    type: Number,
+    required: true,
+  },
+  COrderTime: {
+    type: Date,
+    default: Date.now,
+  },
+  cOrdered: {
+    type: Boolean,
+    default: false,
+  },
+  cPayment: {
+    type: String,
+    enum: ["PAYPAL", "COD"],
+    default: "COD",
+  },
+}, {
+  timestamps: true,
+  strictPopulate: false,
+})
+
+module.exports = mongoose.model('Cart', cartSchema)
