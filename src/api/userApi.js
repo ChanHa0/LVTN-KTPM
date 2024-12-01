@@ -11,9 +11,9 @@ const userApi = {
         }
     },
 
-    loginUser: async (userData) => {
+    loginUser: async (credentials) => {
         try {
-            const response = await axiosClient.post('api/user/login', userData);
+            const response = await axiosClient.post('api/user/login', credentials);
             return response;
         } catch (error) {
             console.error('Error logging in user:', error);

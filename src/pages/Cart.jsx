@@ -1,40 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import LoadingSpinner from '../components/main/LoadingSpinner';
+import LoadingSpinner from '../components/LoadingSpinner';
 import { toast } from 'react-toastify';
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
+    const userId = JSON.parse(localStorage.getItem('user'))?._id;
 
-    // Lấy giỏ hàng từ localStorage
+    // Lấy giỏ hàng từ localStorage theo userId
     useEffect(() => {
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        setCartItems(cart);
-        setLoading(false);
-    }, []);
+        const fetchCart = () => {
+            const cart = JSON.parse(localStorage.getItem(`cart_${userId}`)) || [];
+            setCartItems(cart);
+            setLoading(false);
+        };
+        fetchCart();
+    }, [userId]);
 
     // Cập nhật số lượng
     const updateQuantity = (cartDetailId, quantity) => {
-        const updatedCart = cartItems.map(item => {
-            if (item.id === cartDetailId) {
-                item.quantity = quantity;
-            }
-            return item;
-        });
+        const updatedCart = cartItems.map(item =>
+            item.id === cartDetailId ? { ...item, quantity } : item
+        );
         setCartItems(updatedCart);
-
-        // Lưu lại giỏ hàng vào localStorage
-        localStorage.setItem('cart', JSON.stringify(updatedCart));
+        localStorage.setItem(`cart_${userId}`, JSON.stringify(updatedCart));
+        toast.success('Cập nhật số lượng thành công');
     };
 
     // Xóa sản phẩm khỏi giỏ hàng
     const removeFromCart = (cartDetailId) => {
         const updatedCart = cartItems.filter(item => item.id !== cartDetailId);
         setCartItems(updatedCart);
-
-        // Lưu lại giỏ hàng vào localStorage
-        localStorage.setItem('cart', JSON.stringify(updatedCart));
+        localStorage.setItem(`cart_${userId}`, JSON.stringify(updatedCart));
         toast.success('Đã xóa sản phẩm khỏi giỏ hàng');
     };
 
@@ -47,36 +45,15 @@ const Cart = () => {
             />
             <div className="flex-grow">
                 <h3 className="font-medium">{item.title}</h3>
-                <p className="text-blue-600">{item.price.toLocaleString()}đ</p>
-                <div className="flex items-center gap-4 mt-2">
-                    <div className="flex items-center border rounded">
-                        <button
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="px-3 py-1 hover:bg-gray-100"
-                            disabled={item.quantity <= 1}
-                        >
-                            -
-                        </button>
-                        <span className="px-3 py-1 border-x">{item.quantity}</span>
-                        <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="px-3 py-1 hover:bg-gray-100"
-                        >
-                            +
-                        </button>
-                    </div>
-                    <button
-                        onClick={() => removeFromCart(item.id)}
-                        className="text-red-600 hover:text-red-700"
-                    >
-                        Xóa
-                    </button>
+                <div className="flex items-center mt-2">
+                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1} className="px-2 py-1 bg-gray-200 rounded">-</button>
+                    <span className="mx-2">{item.quantity}</span>
+                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="px-2 py-1 bg-gray-200 rounded">+</button>
                 </div>
+                <button onClick={() => removeFromCart(item.id)} className="mt-2 text-red-500 hover:underline">Xóa</button>
             </div>
             <div className="text-right">
-                <div className="font-medium text-blue-600">
-                    {(item.quantity * item.price).toLocaleString()}đ
-                </div>
+                {item.quantity && item.price ? (item.quantity * item.price).toLocaleString() : 'N/A'}đ
             </div>
         </div>
     );
@@ -114,13 +91,13 @@ const Cart = () => {
         );
     };
 
-    if (loading) return <LoadingSpinner />;
-
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Giỏ hàng của bạn</h2>
 
-            {cartItems.length === 0 ? (
+            {loading ? (
+                <LoadingSpinner />
+            ) : cartItems.length === 0 ? (
                 <div className="text-center text-lg font-medium text-gray-600">Giỏ hàng của bạn trống</div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

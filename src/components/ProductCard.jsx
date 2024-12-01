@@ -4,8 +4,9 @@ import { Link } from 'react-router-dom';
 
 const ProductCard = ({ prId, prTitle, prAuthor, prImage, prPrice, prStockQuantity }) => {
     const formatPrice = (price) => {
-        if (price !== undefined && price !== null && typeof price === 'number') {
-            return price.toLocaleString();
+        const numberPrice = Number(price);
+        if (!isNaN(numberPrice)) {
+            return numberPrice.toLocaleString() + 'đ';
         } else {
             return 'N/A';
         }
@@ -25,14 +26,10 @@ const ProductCard = ({ prId, prTitle, prAuthor, prImage, prPrice, prStockQuantit
                 />
             </div>
             <div className="p-4">
-                <h3 className="text-sm font-semibold text-gray-800 line-clamp-2">{prTitle}</h3>
-                <p className="text-xs text-gray-500 mt-1 line-clamp-1">{prAuthor}</p>
+                <h3 className="text-sm font-semibold text-gray-800">{prTitle}</h3>
+                <p className="text-xs text-gray-500 mt-1">{prAuthor}</p>
                 <p className="text-lg font-bold text-blue-600 mt-2">{formatPrice(prPrice)}</p>
-                {prStockQuantity > 0 ? (
-                    <p className="text-sm text-green-500 mt-1">Còn {prStockQuantity} sản phẩm</p>
-                ) : (
-                    <p className="text-sm text-red-500 mt-1">Hết hàng</p>
-                )}
+                <p className="text-xs text-gray-500 mt-1">Số lượng: {prStockQuantity}</p>
             </div>
         </Link>
     );
@@ -43,8 +40,8 @@ ProductCard.propTypes = {
     prTitle: PropTypes.string.isRequired,
     prAuthor: PropTypes.string,
     prImage: PropTypes.string,
-    prPrice: PropTypes.number.isRequired,
-    prStockQuantity: PropTypes.number.isRequired,
+    prPrice: PropTypes.string.isRequired,
+    prStockQuantity: PropTypes.string.isRequired,
 };
 
 export default ProductCard;

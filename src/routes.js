@@ -4,18 +4,16 @@ import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import ProductDetail from "./pages/ProductDetail";
 import Product from "./pages/Product";
-import Order from "./pages/Order";
 import MyOrders from "./pages/MyOrders";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
-import MainLayout from "./components/main/MainLayout";
-import AuthLayout from "./components/main/AuthLayout";
+import MainLayout from "./components/MainLayout";
+import AuthLayout from "./components/AuthLayout";
 import Dashboard from './pages/Dashboard';
 import ManageProducts from './pages/ManageProducts';
 import ManageUsers from "./pages/ManageUsers";
 import ManageOrders from './pages/ManageOrders';
-import AdminLayout from './components/admin/AdminLayout';
 
 export const routes = [
     {
@@ -31,7 +29,7 @@ export const routes = [
         element: <AuthLayout><Login /></AuthLayout>
     },
     {
-        path: '/profile',
+        path: '/user/:id',
         element: <MainLayout><Profile /></MainLayout>
     },
     {
@@ -47,10 +45,6 @@ export const routes = [
         element: <MainLayout><Cart /></MainLayout>
     },
     {
-        path: '/order',
-        element: <MainLayout><Order /></MainLayout>
-    },
-    {
         path: '/my-orders',
         element: <MainLayout><MyOrders /></MainLayout>
     },
@@ -64,18 +58,18 @@ export const routes = [
     },
     {
         path: '/dashboard',
-        element: <AdminLayout><Dashboard /></AdminLayout>
+        element: <MainLayout><Dashboard /></MainLayout>
     },
     {
         path: '/manage-product',
-        element: <AdminLayout><ManageProducts /></AdminLayout>
+        element: <MainLayout><ManageProducts /></MainLayout>
     },
     {
         path: '/manage-user',
-        element: <AdminLayout><ManageUsers /></AdminLayout>
+        element: <MainLayout><ManageUsers /></MainLayout>
     },
     {
         path: '/manage-order',
-        element: <AdminLayout><ManageOrders /></AdminLayout>
+        element: <MainLayout><ManageOrders /></MainLayout>
     },
 ];

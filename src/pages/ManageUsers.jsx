@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import AdminNavbar from '../components/admin/AdminNavbar';
+import AdminNavbar from '../components/AdminNavbar';
 import { FaPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import LoadingSpinner from '../components/main/LoadingSpinner';
+import LoadingSpinner from '../components/LoadingSpinner';
 import userApi from '../api/userApi';
 
 const ManageUsers = () => {
@@ -70,7 +70,7 @@ const ManageUsers = () => {
             setLoading(true);
             const response = editingUser
                 ? await userApi.updateUser(editingUser._id, formData)
-                : await userApi.createUser(formData);
+                : await userApi.registerUser(formData);
 
             if (response.status === 'OK') {
                 toast.success(editingUser ? 'Cập nhật thành công' : 'Thêm mới thành công');
@@ -131,16 +131,20 @@ const ManageUsers = () => {
         setEditingUser(null);
     };
 
+    const filteredUsers = users.filter(user =>
+        user.uName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.uEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.uPhone.includes(searchTerm)
+    );
+
     return (
         <div className="min-h-screen bg-gray-100">
             <AdminNavbar />
             <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                {/* Header */}
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold text-gray-900">Quản lý người dùng</h1>
                     <p className="mt-2 text-sm text-gray-600">Quản lý và cập nhật thông tin người dùng</p>
                 </div>
-                {/* Search and Add */}
                 <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                     <div className="relative w-full sm:w-96">
                         <input
@@ -162,8 +166,6 @@ const ManageUsers = () => {
                         <FaPlus />
                     </button>
                 </div>
-
-                {/* Table */}
                 <div className="bg-white shadow-md rounded-lg overflow-hidden">
                     {loading ? (
                         <LoadingSpinner />
@@ -172,51 +174,45 @@ const ManageUsers = () => {
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Họ tên</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số điện thoại</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vai trò</th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tên</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Số điện thoại</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vai trò</th>
+                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {users.map((user) => (
-                                        <tr key={user._id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4">
-                                                <div className="text-sm font-medium text-gray-900">{user.uName}</div>
-                                                <div className="text-sm text-gray-500">{user.uAddress}</div>
-                                            </td>
-                                            <td className="px-6 py-4 text-sm text-gray-500">{user.uEmail}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-500">{user.uPhone}</td>
-                                            <td className="px-6 py-4">
-                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${user.uRole === 'ADMIN' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'}`}>
-                                                    {user.uRole}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right space-x-3">
-                                                <button
-                                                    onClick={() => handleEdit(user)}
-                                                    className="text-indigo-600 hover:text-indigo-900 transition duration-150 ease-in-out"
-                                                    title="Sửa"
-                                                >
-                                                    <FaEdit className="inline-block w-5 h-5" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(user._id)}
-                                                    className="text-red-600 hover:text-red-900 transition duration-150 ease-in-out"
-                                                    title="Xóa"
-                                                >
-                                                    <FaTrash className="inline-block w-5 h-5" />
-                                                </button>
+                                    {filteredUsers.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                                                Không có người dùng nào
                                             </td>
                                         </tr>
-                                    ))}
+                                    ) : (
+                                        filteredUsers.map((user) => (
+                                            <tr key={user._id} className="hover:bg-gray-100 transition duration-150 ease-in-out">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.uName}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.uEmail}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.uPhone}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.uRole}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                                                    <button onClick={() => handleEdit(user)} className="text-indigo-600 hover:text-indigo-900 transition duration-150 ease-in-out" title="Chỉnh sửa">
+                                                        <FaEdit className="inline-block w-5 h-5" />
+                                                    </button>
+                                                    <button onClick={() => handleDelete(user._id)} className="text-red-600 hover:text-red-900 transition duration-150 ease-in-out" title="Xóa">
+                                                        <FaTrash className="inline-block w-5 h-5" />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
                                 </tbody>
                             </table>
                         </div>
                     )}
                 </div>
 
+                {/* Form Modal */}
                 {showForm && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                         <div className="bg-white rounded-lg w-full max-w-2xl">
@@ -249,9 +245,7 @@ const ManageUsers = () => {
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700">
-                                                Mật khẩu {editingUser && '(để trống nếu không thay đổi)'}
-                                            </label>
+                                            <label className="block text-sm font-medium text-gray-700">Mật khẩu</label>
                                             <input
                                                 type="password"
                                                 name="uPassword"
@@ -264,7 +258,7 @@ const ManageUsers = () => {
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700">Số điện thoại</label>
                                             <input
-                                                type="tel"
+                                                type="text"
                                                 name="uPhone"
                                                 value={formData.uPhone}
                                                 onChange={handleInputChange}
@@ -290,6 +284,7 @@ const ManageUsers = () => {
                                                 value={formData.uRole}
                                                 onChange={handleInputChange}
                                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                required
                                             >
                                                 {roles.map(role => (
                                                     <option key={role} value={role}>{role}</option>

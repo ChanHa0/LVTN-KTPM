@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import AdminNavbar from '../components/admin/AdminNavbar';
+import AdminNavbar from '../components/AdminNavbar';
 import { FaPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import LoadingSpinner from '../components/main/LoadingSpinner';
+import LoadingSpinner from '../components/LoadingSpinner';
 import productApi from '../api/productApi';
 
 const ManageProducts = () => {
@@ -17,11 +17,10 @@ const ManageProducts = () => {
         prCategory: '',
         prDescription: '',
         prImage: '',
-        prStockQuanlity: '',
+        prStockQuantity: '',
         prPrice: ''
     });
 
-    // Danh sách các danh mục sản phẩm
     const categories = [
         'Sách văn học',
         'Sách thiếu nhi',
@@ -46,8 +45,6 @@ const ManageProducts = () => {
         }
     };
 
-    console.log('Products:', products);
-
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -62,7 +59,7 @@ const ManageProducts = () => {
         if (!formData.prCategory) return 'Vui lòng chọn danh mục';
         if (!formData.prImage.trim()) return 'Vui lòng nhập URL hình ảnh';
         if (!formData.prPrice || formData.prPrice <= 0) return 'Vui lòng nhập giá hợp lệ';
-        if (!formData.prStockQuanlity || formData.prStockQuanlity < 0) return 'Vui lòng nhập số lượng hợp lệ';
+        if (!formData.prStockQuantity || formData.prStockQuantity < 0) return 'Vui lòng nhập số lượng hợp lệ';
         return null;
     };
 
@@ -122,7 +119,7 @@ const ManageProducts = () => {
             prCategory: product.prCategory,
             prDescription: product.prDescription || '',
             prImage: product.prImage,
-            prStockQuanlity: product.prStockQuanlity,
+            prStockQuantity: product.prStockQuantity,
             prPrice: product.prPrice
         });
         setShowForm(true);
@@ -135,7 +132,7 @@ const ManageProducts = () => {
             prCategory: '',
             prDescription: '',
             prImage: '',
-            prStockQuanlity: '',
+            prStockQuantity: '',
             prPrice: ''
         });
         setEditingProduct(null);
@@ -151,12 +148,10 @@ const ManageProducts = () => {
         <div className="min-h-screen bg-gray-100">
             <AdminNavbar />
             <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                {/* Header */}
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold text-gray-900">Quản lý sản phẩm</h1>
                     <p className="mt-2 text-sm text-gray-600">Quản lý và cập nhật thông tin sản phẩm</p>
                 </div>
-                {/* Search and Add */}
                 <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                     <div className="relative w-full sm:w-96">
                         <input
@@ -178,8 +173,6 @@ const ManageProducts = () => {
                         <FaPlus />
                     </button>
                 </div>
-
-                {/* Table */}
                 <div className="bg-white shadow-md rounded-lg overflow-hidden">
                     {loading ? (
                         <LoadingSpinner />
@@ -189,33 +182,25 @@ const ManageProducts = () => {
                                 <thead className="bg-gray-50">
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sản phẩm</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"> Danh mục</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Danh mục</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng</th>
                                         <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {products.length === 0 ? (
+                                    {filteredProducts.length === 0 ? (
                                         <tr>
                                             <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
                                                 Không có sản phẩm nào
                                             </td>
                                         </tr>
                                     ) : (
-                                        products.map((product) => (
+                                        filteredProducts.map((product) => (
                                             <tr key={product._id} className="hover:bg-gray-100 transition duration-150 ease-in-out">
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center">
                                                         <div className="h-16 w-16 flex-shrink-0">
-                                                            {/* <img
-                                                        className="h-16 w-16 object-cover rounded"
-                                                        src={product.prImage}
-                                                        alt={product.prTitle}
-                                                        onError={(e) => {
-                                                            e.target.src = '/placeholder-image.jpg'; // Ảnh mặc định khi lỗi
-                                                        }}
-                                                    /> */}
                                                         </div>
                                                         <div className="ml-4">
                                                             <div className="text-sm font-medium text-gray-900 line-clamp-2">
@@ -239,9 +224,9 @@ const ManageProducts = () => {
                                                     }).format(product.prPrice)}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-900">
-                                                    <span className={`${product.prStockQuanlity <= 10 ? 'text-red-600' : 'text-gray-900'
+                                                    <span className={`${product.prStockQuantity <= 10 ? 'text-red-600' : 'text-gray-900'
                                                         }`}>
-                                                        {product.prStockQuanlity}
+                                                        {product.prStockQuantity}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 text-right space-x-3">
@@ -268,8 +253,6 @@ const ManageProducts = () => {
                         </div>
                     )}
                 </div>
-
-                {/* Form Modal */}
                 {showForm && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                         <div className="bg-white rounded-lg w-full max-w-2xl">
@@ -343,8 +326,8 @@ const ManageProducts = () => {
                                             <label className="block text-sm font-medium text-gray-700">Số lượng</label>
                                             <input
                                                 type="number"
-                                                name="prStockQuanlity"
-                                                value={formData.prStockQuanlity}
+                                                name="prStockQuantity"
+                                                value={formData.prStockQuantity}
                                                 onChange={handleInputChange}
                                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                                 min="0"

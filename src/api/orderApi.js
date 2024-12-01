@@ -3,10 +3,9 @@ import axiosClient from './axiosClient';
 const orderApi = {
     createOrder: async (orderData) => {
         try {
-            const response = await axiosClient.post('api/order', orderData);
-            return response.data;
+            const response = await axiosClient.post('api/order/', orderData);
+            return response;
         } catch (error) {
-            console.error('Error creating order:', error);
             throw error;
         }
     },
@@ -14,19 +13,35 @@ const orderApi = {
     updateOrder: async (id, orderData) => {
         try {
             const response = await axiosClient.put(`api/order/${id}`, orderData);
-            return response.data;
+            return response;
         } catch (error) {
-            console.error('Error updating order:', error);
+            throw error;
+        }
+    },
+
+    deleteOrder: async (id) => {
+        try {
+            const response = await axiosClient.delete(`api/order/${id}`);
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    confirmOrder: async (id) => {
+        try {
+            const response = await axiosClient.put(`api/order/confirm/${id}`);
+            return response;
+        } catch (error) {
             throw error;
         }
     },
 
     cancelOrder: async (id) => {
         try {
-            const response = await axiosClient.delete(`api/order/${id}`);
-            return response.data;
+            const response = await axiosClient.put(`api/order/cancel/${id}`);
+            return response;
         } catch (error) {
-            console.error('Error deleting order:', error);
             throw error;
         }
     },
@@ -34,9 +49,8 @@ const orderApi = {
     getAllOrders: async () => {
         try {
             const response = await axiosClient.get('api/order/all');
-            return response.data;
+            return response;
         } catch (error) {
-            console.error('Error fetching orders:', error);
             throw error;
         }
     },
@@ -44,9 +58,8 @@ const orderApi = {
     getDetailOrder: async (id) => {
         try {
             const response = await axiosClient.get(`api/order/${id}`);
-            return response.data;
+            return response;
         } catch (error) {
-            console.error('Error fetching order:', error);
             throw error;
         }
     },

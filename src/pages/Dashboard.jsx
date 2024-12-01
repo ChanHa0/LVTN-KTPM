@@ -1,38 +1,58 @@
-import React from 'react';
-import { FaBook, FaShoppingCart, FaUsers, FaDollarSign, FaArrowUp, FaArrowDown } from 'react-icons/fa';
-import AdminNavbar from '../components/admin/AdminNavbar';
+import React, { useState, useEffect } from 'react';
+import { FaBook, FaShoppingCart, FaDollarSign, FaArrowUp, FaArrowDown } from 'react-icons/fa';
+import AdminNavbar from '../components/AdminNavbar';
+import productApi from '../api/productApi';
 
 const Dashboard = () => {
-    const stats = [
-        {
-            title: 'Tổng doanh thu',
-            value: '500.000.000đ',
-            icon: <FaDollarSign className="text-blue-500" />,
-            change: '+12.5%',
-            isIncrease: true
-        },
-        {
-            title: 'Đơn hàng',
-            value: '150',
-            icon: <FaShoppingCart className="text-green-500" />,
-            change: '+8.2%',
-            isIncrease: true
-        },
-        {
-            title: 'Sản phẩm',
-            value: '1.200',
-            icon: <FaBook className="text-purple-500" />,
-            change: '-2.4%',
-            isIncrease: false
-        },
-        {
-            title: 'Khách hàng',
-            value: '850',
-            icon: <FaUsers className="text-orange-500" />,
-            change: '+5.7%',
-            isIncrease: true
-        },
-    ];
+    const [stats, setStats] = useState([]);
+
+    useEffect(() => {
+        const fetchStatistics = async () => {
+            try {
+                const response = await productApi.getStatisticsProduct();
+                if (response.status === 'OK') {
+                    const statistics = response.data;
+
+                    setStats([
+                        {
+                            title: 'Tổng doanh thu',
+                            value: `${statistics.totalRevenue}đ`,
+                            icon: <FaDollarSign className="text-blue-500" />,
+                            change: '+12.5%', // Cập nhật theo dữ liệu thực tế
+                            isIncrease: true
+                        },
+                        {
+                            title: 'Tổng số đơn hàng',
+                            value: statistics.totalOrders,
+                            icon: <FaShoppingCart className="text-green-500" />,
+                            change: '+8.2%', // Cập nhật theo dữ liệu thực tế
+                            isIncrease: true
+                        },
+                        {
+                            title: 'Sản phẩm đã bán',
+                            value: statistics.totalProductsSold,
+                            icon: <FaBook className="text-purple-500" />,
+                            change: '+10.0%', // Cập nhật theo dữ liệu thực tế
+                            isIncrease: true
+                        },
+                        {
+                            title: 'Sản phẩm còn trong kho',
+                            value: statistics.totalInventory,
+                            icon: <FaBook className="text-red-500" />,
+                            change: '-5.0%', // Cập nhật theo dữ liệu thực tế
+                            isIncrease: false
+                        },
+                    ]);
+                } else {
+                    console.error('Error fetching statistics:', response.message);
+                }
+            } catch (error) {
+                console.error('Error fetching statistics:', error);
+            }
+        };
+
+        fetchStatistics();
+    }, []);
 
     return (
         <div className="min-h-screen bg-gray-50">

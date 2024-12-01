@@ -17,15 +17,14 @@ const Profile = () => {
     useEffect(() => {
         const fetchUserDetails = async () => {
             try {
-                // Lấy ID từ localStorage hoặc từ nơi lưu trữ sau khi đăng nhập
                 const userId = localStorage.getItem('userId');
                 if (!userId) {
                     toast.error('Vui lòng đăng nhập');
                     return;
                 }
 
-                const result = await userApi.ge(userId);
-                if (result.status === 'OK') {
+                const result = await userApi.getDetailUser(userId);
+                if (result.status === 200) {
                     const userData = result.data;
                     setUser(userData);
                     setFormData({
@@ -36,7 +35,7 @@ const Profile = () => {
                         uAge: userData.uAge || ''
                     });
                 } else {
-                    toast.error(result.message);
+                    toast.error('Không thể lấy thông tin người dùng');
                 }
             } catch (error) {
                 toast.error('Không thể lấy thông tin người dùng');
@@ -61,22 +60,20 @@ const Profile = () => {
         e.preventDefault();
         try {
             const userId = localStorage.getItem('userId');
-            const result = await userApi.updateProfile(userId, formData);
+            const result = await userApi.updateUser(userId, formData);
 
-            if (result.status === 'OK') {
+            if (result.status === 200) {
                 setUser(result.data);
                 toast.success('Cập nhật thông tin thành công!');
                 setIsEditing(false);
             } else {
-                toast.error(result.message);
+                toast.error('Lỗi khi cập nhật thông tin');
             }
         } catch (error) {
             toast.error('Lỗi khi cập nhật thông tin');
             console.error('Error updating user:', error);
         }
     };
-
-    // ... Rest of the component remains the same ...
 
     return (
         <div className="min-h-screen bg-gray-100 py-8">
@@ -134,8 +131,7 @@ const Profile = () => {
                                         name="uName"
                                         value={formData.uName}
                                         onChange={handleChange}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                                        required
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
                                     />
                                 </label>
                             </div>
@@ -147,27 +143,60 @@ const Profile = () => {
                                         name="uEmail"
                                         value={formData.uEmail}
                                         onChange={handleChange}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                                        required
-                                        readOnly
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
                                     />
                                 </label>
                             </div>
-                            {/* Các trường input khác tương tự */}
+                            <div className="mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    Số điện thoại
+                                    <input
+                                        type="text"
+                                        name="uPhone"
+                                        value={formData.uPhone}
+                                        onChange={handleChange}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                                    />
+                                </label>
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    Tuổi
+                                    <input
+                                        type="number"
+                                        name="uAge"
+                                        value={formData.uAge}
+                                        onChange={handleChange}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                                    />
+                                </label>
+                            </div>
+                            <div className="col-span-2 mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    Địa chỉ
+                                    <input
+                                        type="text"
+                                        name="uAddress"
+                                        value={formData.uAddress}
+                                        onChange={handleChange}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                                    />
+                                </label>
+                            </div>
                         </div>
-                        <div className="flex gap-4 mt-6">
-                            <button
-                                type="submit"
-                                className="flex-1 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                            >
-                                Lưu thay đổi
-                            </button>
+                        <div className="flex justify-end">
                             <button
                                 type="button"
                                 onClick={() => setIsEditing(false)}
-                                className="flex-1 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                                className="mr-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
                             >
                                 Hủy
+                            </button>
+                            <button
+                                type="submit"
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            >
+                                Lưu
                             </button>
                         </div>
                     </form>

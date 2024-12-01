@@ -1,43 +1,56 @@
 import axiosClient from './axiosClient';
 
 const cartApi = {
-    addToCart: async (userId, productId, quantity) => {
+    addToCart: async (uId, prId, cdQuantity) => {
         try {
             const response = await axiosClient.post('api/cart/', {
-                userId,
-                productId,
-                quantity
+                uId,
+                prId,
+                cdQuantity
             });
-            return response.data;
+            return response;
         } catch (error) {
             throw error;
         }
     },
 
-    updateCartItem: async (cartItemId, quantity) => {
+    updateCartItem: async (cId, prId, cdQuantity) => {
         try {
-            const response = await axiosClient.put(`api/cart/${cartItemId}`, {
-                quantity
+            const response = await axiosClient.put(`api/cart/${cId}`, {
+                prId,
+                cdQuantity
             });
-            return response.data;
+            return response;
         } catch (error) {
             throw error;
         }
     },
 
-    removeFromCart: async (cartItemId) => {
+    removeFromCart: async (cId, prId) => {
         try {
-            const response = await axiosClient.delete(`api/cart/${cartItemId}`);
-            return response.data;
+            const response = await axiosClient.delete(`api/cart/${cId}/${prId}`);
+            return response;
         } catch (error) {
             throw error;
         }
     },
 
-    getCart: async (userId) => {
+    getCart: async (uId) => {
         try {
-            const response = await axiosClient.get(`api/cart/${userId}`);
-            return response.data;
+            const response = await axiosClient.get(`api/cart/${uId}`);
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    addMultipleToCart: async (uId, products) => {
+        try {
+            const response = await axiosClient.post('api/cart/multiple', {
+                uId,
+                products
+            });
+            return response;
         } catch (error) {
             throw error;
         }

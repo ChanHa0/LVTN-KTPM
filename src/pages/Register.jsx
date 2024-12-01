@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import userApi from '../api/userApi'; // Thay authApi bằng userApi
+import userApi from '../api/userApi';
 
 const Register = () => {
     const navigate = useNavigate();
@@ -30,7 +30,6 @@ const Register = () => {
             toast.error('Vui lòng nhập email');
             return false;
         }
-        // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formData.uEmail)) {
             toast.error('Email không hợp lệ');
@@ -72,43 +71,72 @@ const Register = () => {
                 throw new Error(response.message || 'Đăng ký thất bại');
             }
         } catch (error) {
-            const errorMessage = error.response?.data?.message || error.message || 'Đăng ký thất bại';
-            toast.error(errorMessage);
+            toast.error(error.message || 'Có lỗi xảy ra khi đăng ký');
         } finally {
             setLoading(false);
         }
     };
 
-    const renderInput = (id, label, type = 'text') => (
-        <div className="mb-4">
-            <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
-                {label}
-            </label>
-            <input
-                type={type}
-                id={id}
-                value={formData[id]}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                placeholder={`Nhập ${label.toLowerCase()}`}
-            />
-        </div>
-    );
-
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full mx-auto">
                 <h2 className="text-center text-3xl font-extrabold text-gray-900 mb-8">
-                    Đăng ký tài khoản
+                    Đăng ký
                 </h2>
-
                 <div className="bg-white p-8 rounded-lg shadow-md">
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        {renderInput('uName', 'Họ tên')}
-                        {renderInput('uEmail', 'Email', 'email')}
-                        {renderInput('uPassword', 'Mật khẩu', 'password')}
-                        {renderInput('uConfirmPassword', 'Xác nhận mật khẩu', 'password')}
-
+                        <div className="mb-4">
+                            <label htmlFor="uName" className="block text-sm font-medium text-gray-700 mb-1">
+                                Họ tên
+                            </label>
+                            <input
+                                type="text"
+                                id="uName"
+                                value={formData.uName}
+                                onChange={handleChange}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                placeholder="Nhập họ tên"
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="uEmail" className="block text-sm font-medium text-gray-700 mb-1">
+                                Email
+                            </label>
+                            <input
+                                type="email"
+                                id="uEmail"
+                                value={formData.uEmail}
+                                onChange={handleChange}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                placeholder="Nhập email"
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="uPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                                Mật khẩu
+                            </label>
+                            <input
+                                type="password"
+                                id="uPassword"
+                                value={formData.uPassword}
+                                onChange={handleChange}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                placeholder="Nhập mật khẩu"
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="uConfirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                                Xác nhận mật khẩu
+                            </label>
+                            <input
+                                type="password"
+                                id="uConfirmPassword"
+                                value={formData.uConfirmPassword}
+                                onChange={handleChange}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                placeholder="Nhập lại mật khẩu"
+                            />
+                        </div>
                         <button
                             type="submit"
                             disabled={loading}
@@ -118,17 +146,6 @@ const Register = () => {
                         >
                             {loading ? 'Đang xử lý...' : 'Đăng ký'}
                         </button>
-
-                        <div className="text-center mt-4">
-                            <span className="text-gray-600">Đã có tài khoản? </span>
-                            <button
-                                type="button"
-                                onClick={() => navigate('/login')}
-                                className="text-blue-600 hover:text-blue-500 font-medium"
-                            >
-                                Đăng nhập
-                            </button>
-                        </div>
                     </form>
                 </div>
             </div>

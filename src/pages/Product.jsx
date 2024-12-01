@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import ProductCard from '../components/main/ProductCard';
-import LoadingSpinner from '../components/main/LoadingSpinner';
+import ProductCard from '../components/ProductCard';
+import LoadingSpinner from '../components/LoadingSpinner';
 import productApi from '../api/productApi';
 
 const ProductList = () => {
@@ -10,7 +10,7 @@ const ProductList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const productsPerPage = 8; // Số sản phẩm hiển thị mỗi trang
+    const productsPerPage = 8;
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -18,9 +18,8 @@ const ProductList = () => {
                 setLoading(true);
                 const response = await productApi.getAllProducts();
                 const data = Array.isArray(response.data) ? response.data : [];
-                const slicedData = data.slice(0, 10);
-                setProducts(slicedData);
-                setFilteredProducts(data); // Khởi tạo danh sách lọc bằng toàn bộ sản phẩm
+                setProducts(data);
+                setFilteredProducts(data);
             } catch (error) {
                 setError(error.message || 'Lỗi không xác định');
             } finally {
@@ -31,7 +30,6 @@ const ProductList = () => {
         fetchProducts();
     }, []);
 
-    // Xử lý tìm kiếm sản phẩm
     const handleSearch = (event) => {
         const keyword = event.target.value.toLowerCase();
         setSearchTerm(keyword);
@@ -42,15 +40,13 @@ const ProductList = () => {
                 product.prAuthor?.toLowerCase().includes(keyword)
         );
         setFilteredProducts(filtered);
-        setCurrentPage(1); // Reset về trang đầu khi tìm kiếm
+        setCurrentPage(1);
     };
 
-    // Tính toán sản phẩm trên trang hiện tại
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
-    // Chuyển trang
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     if (loading) return <LoadingSpinner />;
@@ -59,7 +55,6 @@ const ProductList = () => {
     return (
         <div className="bg-gray-50 py-8">
             <div className="container mx-auto max-w-screen-xl px-4">
-                {/* Header */}
                 <div className="mb-6 text-center">
                     <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Danh sách sản phẩm</h1>
                     <p className="text-gray-600 mt-2">
@@ -67,7 +62,6 @@ const ProductList = () => {
                     </p>
                 </div>
 
-                {/* Search Bar */}
                 <div className="mb-8">
                     <input
                         type="text"
@@ -78,7 +72,6 @@ const ProductList = () => {
                     />
                 </div>
 
-                {/* Product Grid */}
                 {currentProducts.length === 0 ? (
                     <div className="flex justify-center items-center h-64 text-gray-500 text-lg">
                         Không có sản phẩm nào phù hợp.
@@ -99,11 +92,10 @@ const ProductList = () => {
                     </div>
                 )}
 
-                {/* Pagination */}
                 <div className="mt-8 flex justify-center items-center space-x-2">
                     {Array.from({ length: Math.ceil(filteredProducts.length / productsPerPage) }, (_, index) => (
                         <button
-                            key={index}
+                            key={index} YY
                             onClick={() => paginate(index + 1)}
                             className={`px-4 py-2 border rounded-lg ${currentPage === index + 1
                                 ? 'bg-blue-500 text-white'
