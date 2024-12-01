@@ -63,7 +63,7 @@ const ProductService = {
         }
     },
 
-    getAllProduct: async () => {
+    getAllProducts: async () => {
         try {
             // Lấy tất cả sản phẩm
             const products = await Product.find();
@@ -150,6 +150,31 @@ const ProductService = {
 
         } catch (error) {
             return { status: 'ERR', message: 'Lỗi tìm kiếm sản phẩm', error: error.message };
+        }
+    },
+
+    getStatisticsProduct: async () => {
+        try {
+            // Lấy tất cả sản phẩm
+            const products = await Product.find();
+
+            // Tính tổng số lượng sản phẩm trong kho
+            const totalInventory = products.reduce((sum, product) => sum + product.prStockQuantity, 0);
+
+            // Tính tổng doanh thu dự kiến (giả sử tất cả sản phẩm đều được bán)
+            const totalRevenue = products.reduce((sum, product) => sum + product.prPrice * product.prStockQuantity, 0);
+
+            return {
+                status: 'OK',
+                message: 'Lấy thống kê sản phẩm thành công',
+                data: { totalInventory, totalRevenue }
+            };
+        } catch (error) {
+            return {
+                status: 'ERR',
+                message: 'Lỗi lấy thống kê sản phẩm',
+                error: error.message
+            };
         }
     },
 };

@@ -12,26 +12,27 @@ const orderSchema = new mongoose.Schema({
     ref: "Cart",
     required: true,
   },
-  oStatus: {
-    type: Boolean,
-    default: false,
-  },
-  oOrderdate: {
+  oOrderDate: {
     type: Date,
     default: Date.now,
   },
-  oTotalamount: {
-    type: Number,
-    required: true,
+  oStatus: {
+    type: String,
+    enum: ["PENDING", "CONFIRMED", "CANCELLED"],
+    default: "PENDING",
   },
-  oShippingaddress: {
+  oTotalAmount: {
     type: String,
     required: true,
   },
-  oShippingmethod: {
+  oShippingAddress: {
+    type: String,
+    required: true,
+  },
+  oShippingMethod: {
     type: String,
     required: true,
   }
-}, { timestamps: true })
+}, { timestamps: true, strictPopulate: false, })
 
 module.exports = mongoose.model('Order', orderSchema)

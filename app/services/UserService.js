@@ -66,7 +66,7 @@ const UserService = {
         }
     },
 
-    getAllUser: async () => {
+    getAllUsers: async () => {
         try {
             // Lấy danh sách người dùng
             const users = await User.find();

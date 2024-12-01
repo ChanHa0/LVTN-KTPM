@@ -52,9 +52,9 @@ const UserController = {
         }
     },
     // Get all user
-    getAllUser: async (req, res) => {
+    getAllUsers: async (req, res) => {
         try {
-            const result = await UserService.getAllUser();
+            const result = await UserService.getAllUsers();
             if (result.status === 'ERR') {
                 return res.status(404).json(result);
             }

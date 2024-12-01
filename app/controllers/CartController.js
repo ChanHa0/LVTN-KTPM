@@ -40,16 +40,19 @@ const CartController = {
         }
     },
     // Get cart
+
     getCart: async (req, res) => {
         try {
-            const { uId } = req.params;
-            const result = await CartService.getCart(uId);
-            if (result.status === 'ERR') {
+
+            const userId = req.params.userId;
+            // Sử dụng từ khóa 'new' khi tạo ObjectId
+            const userObjectId = new ObjectId(userId);
+            if (!userObjectId) {
                 return res.status(404).json(result);
             }
-            res.status(200).json(result);
+            res.status(200).json(userObjectId);
         } catch (error) {
-            res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
+            res.status(500).json({ status: "ERR", message: "Lỗi khi lấy giỏ hàng", error: error.message });
         }
     },
 };

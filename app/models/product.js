@@ -22,16 +22,15 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
   prStockQuantity: {
-    type: Number,
-    required: false,
+    type: String,
+    required: true,
   },
   prPrice: {
-    type: Number,
-    required: false,
+    type: String,
+    required: true,
   }
 }, { timestamps: true })
 
 productSchema.index({ prTitle: 'text', prAuthor: 'text', prDescription: 'text' })
-const Product = mongoose.model('Product', productSchema)
 
-module.exports = Product
+module.exports = mongoose.model('Product', productSchema)

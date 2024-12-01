@@ -40,9 +40,9 @@ const ProductController = {
         }
     },
     // Get all product
-    getAllProduct: async (req, res) => {
+    getAllProducts: async (req, res) => {
         try {
-            const result = await ProductService.getAllProduct();
+            const result = await ProductService.getAllProducts();
             if (result.status === 'ERR') {
                 return res.status(404).json(result);
             }
@@ -68,6 +68,18 @@ const ProductController = {
     searchProduct: async (req, res) => {
         try {
             const result = await ProductService.searchProduct(req.query);
+            if (result.status === 'ERR') {
+                return res.status(404).json(result);
+            }
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
+        }
+    },
+    // Get statistics
+    getStatisticsProduct: async (req, res) => {
+        try {
+            const result = await ProductService.getStatisticsProduct();
             if (result.status === 'ERR') {
                 return res.status(404).json(result);
             }
