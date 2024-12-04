@@ -1,7 +1,7 @@
 const CartService = require('../services/CartService');
 
 const CartController = {
-    // Add to cart
+    // Thêm sản phẩm vào giỏ hàng
     addToCart: async (req, res) => {
         try {
             const result = await CartService.addToCart(req.body);
@@ -13,8 +13,8 @@ const CartController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Edit to cart
-    editToCart: async (req, res) => {
+    // Sửa sản phẩm trong giỏ hàng
+    updateCartItem: async (req, res) => {
         try {
             const { id, prId } = req.params;
             const result = await CartService.editToCart(id, prId, req.body);
@@ -26,8 +26,8 @@ const CartController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Delete to cart
-    deleteToCart: async (req, res) => {
+    // Xóa sản phẩm trong giỏ hàng
+    removeFromCart: async (req, res) => {
         try {
             const { id, prId } = req.params;
             const result = await CartService.deleteToCart(id, prId);
@@ -39,22 +39,31 @@ const CartController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Get cart
-
+    // Lấy giỏ hàng
     getCart: async (req, res) => {
         try {
-
-            const userId = req.params.userId;
-            // Sử dụng từ khóa 'new' khi tạo ObjectId
-            const userObjectId = new ObjectId(userId);
-            if (!userObjectId) {
-                return res.status(404).json(result);
+            const uId = req.params.uId;
+            if (!uId) {
+                return res.status(404).json({ status: 'ERR', message: 'Id không tồn tại' });
             }
-            res.status(200).json(userObjectId);
+            const result = await CartService.getCart(uId);
+            res.status(200).json(result);
         } catch (error) {
-            res.status(500).json({ status: "ERR", message: "Lỗi khi lấy giỏ hàng", error: error.message });
+            res.status(500).json({ status: "ERR", message: "Lỗi server", error: error.message });
         }
     },
+    // Thêm nhiều sản phẩm vào giỏ hàng
+    addMultipleToCart: async (req, res) => {
+        try {
+            const result = await CartService.addMultipleToCart(req.body);
+            if (result.status === 'ERR') {
+                return res.status(404).json(result);
+            }
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(500).json({ status: "ERR", message: "Lỗi server", error: error.message });
+        }
+    }
 };
 
 module.exports = CartController;

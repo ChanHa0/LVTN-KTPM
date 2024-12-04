@@ -13,11 +13,15 @@ const cartDetailSchema = new mongoose.Schema({
         required: true,
     },
     cdQuantity: {
-        type: String,
+        type: Number,
         required: true,
     },
-    cdTotalPrice: {
-        type: String,
+    cdPrice: {
+        type: Number,
+        required: true,
+    },
+    cdSubTotal: {
+        type: Number,
         required: true,
     }
 }, { timestamps: true })

@@ -1,25 +1,28 @@
-const jwt = require('jsonwebtoken');
+// const jwt = require('jsonwebtoken');
 
-const authMiddleware = async (req, res, next) => {
-    try {
-        const token = req.headers.authorization?.split(' ')[1];
+// // Kiểm tra người dùng đã đăng nhập
+// const isAuthenticated = (req, res, next) => {
+//     const token = req.headers.authorization?.split(" ")[1];
+//     if (!token) {
+//         return res.status(401).json({ message: "Không tìm thấy token xác thực" });
+//     }
+//     try {
+//         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+//         req.user = decoded; // Lưu thông tin người dùng từ token
+//         next();
+//     } catch (error) {
+//         res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
+//     }
+// };
 
-        if (!token) {
-            return res.status(401).json({
-                status: 'ERR',
-                message: 'Không tìm thấy token xác thực'
-            });
-        }
+// // Phân quyền (role-based access control)
+// const authorizeRoles = (...roles) => {
+//     return (req, res, next) => {
+//         if (!roles.includes(req.user.role)) {
+//             return res.status(403).json({ message: "Không có quyền truy cập" });
+//         }
+//         next();
+//     };
+// };
 
-        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-        req.user = decoded;
-        next();
-    } catch (error) {
-        return res.status(401).json({
-            status: 'ERR',
-            message: 'Token không hợp lệ hoặc đã hết hạn'
-        });
-    }
-};
-
-module.exports = authMiddleware;
+// module.exports = { isAuthenticated, authorizeRoles };

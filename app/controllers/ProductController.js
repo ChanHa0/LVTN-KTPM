@@ -1,7 +1,7 @@
 const ProductService = require('../services/ProductService');
 
 const ProductController = {
-    // Create product
+    // Tạo sản phẩm
     createProduct: async (req, res) => {
         try {
             const result = await ProductService.createProduct(req.body);
@@ -13,7 +13,7 @@ const ProductController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Update product
+    // Cập nhật sản phẩm
     updateProduct: async (req, res) => {
         try {
             const { id } = req.params;
@@ -26,7 +26,7 @@ const ProductController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Delete product
+    // Xóa sản phẩm
     deleteProduct: async (req, res) => {
         try {
             const { id } = req.params;
@@ -39,7 +39,7 @@ const ProductController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Get all product
+    // Lấy tất cả sản phẩm
     getAllProducts: async (req, res) => {
         try {
             const result = await ProductService.getAllProducts();
@@ -51,7 +51,7 @@ const ProductController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Get detail product
+    // Lấy chi tiết sản phẩm
     getDetailProduct: async (req, res) => {
         try {
             const { id } = req.params;
@@ -64,7 +64,7 @@ const ProductController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Search product
+    // Tìm kiếm sản phẩm
     searchProduct: async (req, res) => {
         try {
             const result = await ProductService.searchProduct(req.query);
@@ -76,10 +76,36 @@ const ProductController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Get statistics
-    getStatisticsProduct: async (req, res) => {
+    // Tạo đánh giá sản phẩm
+    createProductReview: async (req, res) => {
         try {
-            const result = await ProductService.getStatisticsProduct();
+            const result = await ProductService.createProductReview(req.body);
+            if (result.status === 'ERR') {
+                return res.status(404).json(result);
+            }
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
+        }
+    },
+    // Lấy đánh giá sản phẩm
+    getRatingProduct: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const result = await ProductService.getRatingProduct(id);
+            if (result.status === 'ERR') {
+                return res.status(404).json(result);
+            }
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
+        }
+    },
+    // Lấy bình luận sản phẩm
+    getCommentProduct: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const result = await ProductService.getCommentProduct(id);
             if (result.status === 'ERR') {
                 return res.status(404).json(result);
             }

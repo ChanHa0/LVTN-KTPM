@@ -12,17 +12,19 @@ const orderSchema = new mongoose.Schema({
     ref: "Cart",
     required: true,
   },
-  oOrderDate: {
-    type: Date,
-    default: Date.now,
+  sId: {
+    type: Schema.Types.ObjectId,
+    ref: "Statistic",
+    required: true,
+  },
+  oTotalPrice: {
+    type: Number,
+    required: true,
   },
   oStatus: {
     type: String,
     enum: ["PENDING", "CONFIRMED", "CANCELLED"],
     default: "PENDING",
-  },
-  oTotalAmount: {
-    type: String,
     required: true,
   },
   oShippingAddress: {
@@ -31,8 +33,19 @@ const orderSchema = new mongoose.Schema({
   },
   oShippingMethod: {
     type: String,
+    enum: ["Giao hàng tiêu chuẩn", "Giao hàng nhanh"],
+    required: true,
+  },
+  oPaymentMethod: {
+    type: String,
+    enum: ["PAYPAL", "COD"],
+    default: "COD",
+    required: true,
+  },
+  oPayment: {
+    type: String,
     required: true,
   }
-}, { timestamps: true, strictPopulate: false, })
+}, { timestamps: true, strictPopulate: false })
 
 module.exports = mongoose.model('Order', orderSchema)

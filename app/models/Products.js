@@ -13,21 +13,31 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  prCategory: {
+    type: String,
+    enum: ['Sách văn học', 'Sách khoa học', 'Sách kinh tế', 'Tiểu thuyết', 'Truyện tranh', 'Sách ngoại ngữ', 'Sách thiếu nhi'],
+    required: true,
+  },
   prDescription: {
     type: String,
     required: true,
   },
-  prCategory: {
-    type: String,
-    required: true,
-  },
   prStockQuantity: {
-    type: String,
+    type: Number,
     required: true,
   },
   prPrice: {
-    type: String,
+    type: Number,
     required: true,
+  },
+  prRating: {
+    type: Number,
+    min: 1,
+    max: 5,
+  },
+  prComment: {
+    type: String,
+    maxLength: 255,
   }
 }, { timestamps: true })
 

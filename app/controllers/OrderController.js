@@ -1,7 +1,7 @@
 const OrderService = require('../services/OrderService');
 
 const OrderController = {
-    // Create order
+    // Tạo đơn hàng
     createOrder: async (req, res) => {
         try {
             const result = await OrderService.createOrder(req.body);
@@ -13,7 +13,7 @@ const OrderController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Update order
+    //Cập nhật đơn hàng
     updateOrder: async (req, res) => {
         try {
             const { id } = req.params;
@@ -26,7 +26,7 @@ const OrderController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Delete order
+    // Xóa đơn hàng
     deleteOrder: async (req, res) => {
         try {
             const { id } = req.params;
@@ -39,7 +39,7 @@ const OrderController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Confirm order
+    // Xác nhận đơn hàng
     confirmOrder: async (req, res) => {
         try {
             const { id } = req.params;
@@ -52,7 +52,7 @@ const OrderController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Cancel order
+    // Hủy đơn hàng
     cancelOrder: async (req, res) => {
         try {
             const { id } = req.params;
@@ -65,7 +65,7 @@ const OrderController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Get all order
+    // Lấy tất cả đơn hàng
     getAllOrders: async (req, res) => {
         try {
             const result = await OrderService.getAllOrders();
@@ -77,7 +77,7 @@ const OrderController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Get detail order
+    // Lấy chi tiết đơn hàng
     getDetailOrder: async (req, res) => {
         try {
             const { id } = req.params;

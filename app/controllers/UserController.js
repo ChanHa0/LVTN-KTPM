@@ -1,7 +1,7 @@
 const UserService = require('../services/UserService');
 
 const UserController = {
-    // Register user
+    // Đăng ký người dùng
     registerUser: async (req, res) => {
         try {
             const result = await UserService.registerUser(req.body);
@@ -13,7 +13,7 @@ const UserController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Login user
+    // Đăng nhập người dùng
     loginUser: async (req, res) => {
         try {
             const result = await UserService.loginUser(req.body);
@@ -25,7 +25,7 @@ const UserController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Update user
+    // Cập nhật người dùng
     updateUser: async (req, res) => {
         try {
             const { id } = req.params;
@@ -38,7 +38,7 @@ const UserController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Delete user
+    // Xóa người dùng
     deleteUser: async (req, res) => {
         try {
             const { id } = req.params;
@@ -51,7 +51,7 @@ const UserController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Get all user
+    // Lấy tất cả người dùng
     getAllUsers: async (req, res) => {
         try {
             const result = await UserService.getAllUsers();
@@ -63,7 +63,7 @@ const UserController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Get detail user
+    // Lấy chi tiết người dùng
     getDetailUser: async (req, res) => {
         try {
             const { id } = req.params;

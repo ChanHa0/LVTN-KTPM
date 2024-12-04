@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/user');
+const User = require('../models/Users');
 
 const UserService = {
     registerUser: async (userData) => {
@@ -26,6 +26,36 @@ const UserService = {
 
         } catch (error) {
             return { status: 'ERR', message: 'Lỗi đăng ký người dùng', error: error.message };
+        }
+    },
+
+    loginUser: async (userData) => {
+        try {
+            const { uEmail, uPassword } = userData;
+            const user = await User.findOne({ uEmail });
+
+            if (!user) {
+                return { status: 'ERR', message: 'Email không tồn tại' };
+            }
+
+            const isMatch = await bcrypt.compare(uPassword, user.uPassword);
+            if (!isMatch) {
+                return { status: 'ERR', message: 'Mật khẩu không đúng' };
+            }
+
+            const token = jwt.sign(
+                {
+                    id: user._id,
+                    email: user.uEmail,
+                    role: user.uRole
+                },
+                process.env.JWT_SECRET || 'your-secret-key',
+                { expiresIn: '24h' }
+            );
+            return { status: 'OK', message: 'Đăng nhập thành công', data: { token, user } };
+
+        } catch (error) {
+            return { status: 'ERR', message: 'Lỗi đăng nhập', error: error.message };
         }
     },
 
@@ -87,36 +117,6 @@ const UserService = {
 
         } catch (error) {
             return { status: 'ERR', message: 'Lỗi lấy chi tiết người dùng', error: error.message };
-        }
-    },
-
-    loginUser: async (userData) => {
-        try {
-            const { uEmail, uPassword } = userData;
-            const user = await User.findOne({ uEmail });
-
-            if (!user) {
-                return { status: 'ERR', message: 'Email không tồn tại' };
-            }
-
-            const isMatch = await bcrypt.compare(uPassword, user.uPassword);
-            if (!isMatch) {
-                return { status: 'ERR', message: 'Mật khẩu không đúng' };
-            }
-
-            const token = jwt.sign(
-                {
-                    id: user._id,
-                    email: user.uEmail,
-                    role: user.uRole
-                },
-                process.env.JWT_SECRET || 'your-secret-key',
-                { expiresIn: '24h' }
-            );
-            return { status: 'OK', message: 'Đăng nhập thành công', data: { token, user } };
-
-        } catch (error) {
-            return { status: 'ERR', message: 'Lỗi đăng nhập', error: error.message };
         }
     },
 };

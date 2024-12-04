@@ -1,8 +1,8 @@
-const Product = require('../models/product');
+const Product = require('../models/Products');
 
 const ProductService = {
     createProduct: async (productData) => {
-        const { prTitle, prAuthor, prCategory, prImage, prStockQuantity, prDescription, prPrice } = productData;
+        const { prTitle, prAuthor, prCategory, prImage, prStockQuantity, prDescription, prPrice, prRating, prComment } = productData;
         try {
             // Kiểm tra xem sản phẩm đã tồn tại
             const existingProduct = await Product.findOne({ prTitle });
@@ -21,7 +21,9 @@ const ProductService = {
                 prImage,
                 prDescription,
                 prStockQuantity,
-                prPrice
+                prPrice,
+                prRating,
+                prComment
             });
             return { status: 'OK', message: 'Tạo sản phẩm thành công', data: newProduct };
 
@@ -152,29 +154,31 @@ const ProductService = {
             return { status: 'ERR', message: 'Lỗi tìm kiếm sản phẩm', error: error.message };
         }
     },
-
-    getStatisticsProduct: async () => {
+    createProductReview: async (reviewData) => {
         try {
-            // Lấy tất cả sản phẩm
-            const products = await Product.find();
-
-            // Tính tổng số lượng sản phẩm trong kho
-            const totalInventory = products.reduce((sum, product) => sum + product.prStockQuantity, 0);
-
-            // Tính tổng doanh thu dự kiến (giả sử tất cả sản phẩm đều được bán)
-            const totalRevenue = products.reduce((sum, product) => sum + product.prPrice * product.prStockQuantity, 0);
-
-            return {
-                status: 'OK',
-                message: 'Lấy thống kê sản phẩm thành công',
-                data: { totalInventory, totalRevenue }
-            };
+            const { prId, prRating, prComment } = reviewData;
+            const newReview = await Review.create({ prId, prRating, prComment });
+            return { status: 'OK', message: 'Tạo đánh giá sản phẩm thành công', data: newReview };
         } catch (error) {
-            return {
-                status: 'ERR',
-                message: 'Lỗi lấy thống kê sản phẩm',
-                error: error.message
-            };
+            return { status: 'ERR', message: 'Lỗi tạo đánh giá sản phẩm', error: error.message };
+        }
+    },
+
+    getRatingProduct: async (id) => {
+        try {
+            const product = await Product.findById(id);
+            return product.prRating;
+        } catch (error) {
+            return { status: 'ERR', message: 'Lỗi lấy đánh giá sản phẩm', error: error.message };
+        }
+    },
+
+    getCommentProduct: async (id) => {
+        try {
+            const product = await Product.findById(id);
+            return product.prComment;
+        } catch (error) {
+            return { status: 'ERR', message: 'Lỗi lấy bình luận sản phẩm', error: error.message };
         }
     },
 };

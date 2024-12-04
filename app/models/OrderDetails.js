@@ -5,7 +5,7 @@ const orderDetailSchema = new mongoose.Schema({
     prId: {
         type: Schema.Types.ObjectId,
         ref: "Product",
-
+        required: true,
     },
     oId: {
         type: Schema.Types.ObjectId,
@@ -13,12 +13,16 @@ const orderDetailSchema = new mongoose.Schema({
         required: true,
     },
     odQuantity: {
-        type: String,
-
+        type: Number,
+        required: true,
     },
     odPrice: {
-        type: String,
-
+        type: Number,
+        required: true,
+    },
+    odSubTotal: {
+        type: Number,
+        required: true,
     }
 }, { timestamps: true });
 

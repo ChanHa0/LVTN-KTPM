@@ -2,8 +2,10 @@
     "prTitle": "Lập Trình JavaScript Cơ Bản",
     "prAuthor": "Nguyễn Văn B",
     "prImage": "https://example.com/images/javascript-book.jpg",
+    "prCategory": "Sách khoa học",
     "prDescription": "Cuốn sách này cung cấp kiến thức cơ bản về lập trình JavaScript, từ cú pháp đến các khái niệm nâng cao.",
-    "prCategory": "Programming",
     "prStockQuantity": 100,
-    "prPrice": 250000
+    "prPrice": 250000,
+    "prRating": 4,
+    "prComment": "Cuốn sách này rất hữu ích và dễ hiểu."
 }

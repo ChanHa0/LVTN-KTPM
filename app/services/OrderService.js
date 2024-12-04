@@ -1,17 +1,21 @@
-const Order = require('../models/order');
-const OrderDetail = require('../models/orderdetail');
-const Product = require('../models/product');
+const Order = require('../models/Orders');
+const OrderDetail = require('../models/OrderDetails');
+const Product = require('../models/Products');
 
 const OrderService = {
     createOrder: async (orderData) => {
-        const { uId, oTotalamount, oShippingaddress, oShippingmethod, items } = orderData;
+        const { uId, cId, sId, oTotalPrice, oShippingAddress, oShippingMethod, oPaymentMethod, oPayment, items } = orderData;
         try {
             // Tạo đơn hàng mới
             const newOrder = await Order.create({
                 uId,
-                oTotalamount,
-                oShippingaddress,
-                oShippingmethod,
+                cId,
+                sId,
+                oTotalPrice,
+                oShippingAddress,
+                oShippingMethod,
+                oPaymentMethod,
+                oPayment,
                 oStatus: 'PENDING', // Đơn hàng mới thường có trạng thái PENDING
             });
 
@@ -21,7 +25,8 @@ const OrderService = {
                     oId: newOrder._id,
                     prId: item.prId,
                     odQuantity: item.quantity,
-                    odPrice: item.price
+                    odPrice: item.price,
+                    odSubTotal: item.quantity * item.price // Tính toán tổng phụ
                 });
                 await orderDetail.save();
             }
@@ -50,6 +55,7 @@ const OrderService = {
                     if (orderDetail) {
                         orderDetail.odQuantity = item.quantity;
                         orderDetail.odPrice = item.price;
+                        orderDetail.odSubTotal = item.quantity * item.price; // Cập nhật tổng phụ
                         await orderDetail.save();
                     } else {
                         // Nếu không tìm thấy OrderDetail, tạo mới
@@ -57,7 +63,8 @@ const OrderService = {
                             oId: id,
                             prId: item.prId,
                             odQuantity: item.quantity,
-                            odPrice: item.price
+                            odPrice: item.price,
+                            odSubTotal: item.quantity * item.price // Tính toán tổng phụ
                         });
                         await orderDetail.save();
                     }
