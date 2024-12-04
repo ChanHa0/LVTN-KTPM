@@ -65,9 +65,9 @@ const ProductController = {
         }
     },
     // Tìm kiếm sản phẩm
-    searchProduct: async (req, res) => {
+    searchProducts: async (req, res) => {
         try {
-            const result = await ProductService.searchProduct(req.query);
+            const result = await ProductService.searchProducts(req.query);
             if (result.status === 'ERR') {
                 return res.status(404).json(result);
             }

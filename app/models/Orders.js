@@ -7,16 +7,24 @@ const orderSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  cId: {
-    type: Schema.Types.ObjectId,
-    ref: "Cart",
-    required: true,
-  },
-  sId: {
-    type: Schema.Types.ObjectId,
-    ref: "Statistic",
-    required: true,
-  },
+  oItems: [
+    {
+      prId: {
+        type: Schema.Types.ObjectId,
+        ref: "Product",
+        required: true,
+      },
+      prQuantity: {
+        type: Number,
+        required: true,
+        default: 1,
+      },
+      prPrice: {
+        type: Number,
+        required: true,
+      },
+    }
+  ],
   oTotalPrice: {
     type: Number,
     required: true,
@@ -42,10 +50,6 @@ const orderSchema = new mongoose.Schema({
     default: "COD",
     required: true,
   },
-  oPayment: {
-    type: String,
-    required: true,
-  }
 }, { timestamps: true, strictPopulate: false })
 
 module.exports = mongoose.model('Order', orderSchema)

@@ -13,7 +13,7 @@ const OrderController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    //Cập nhật đơn hàng
+    // Cập nhật đơn hàng
     updateOrder: async (req, res) => {
         try {
             const { id } = req.params;

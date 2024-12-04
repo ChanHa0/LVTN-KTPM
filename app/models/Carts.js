@@ -7,18 +7,19 @@ const cartSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  cdItems: [
+  cItems: [
     {
       prId: {
         type: Schema.Types.ObjectId,
         ref: "Product",
         required: true,
       },
-      cdQuantity: {
+      prQuantity: {
         type: Number,
         required: true,
+        default: 1,
       },
-      cdPrice: {
+      prPrice: {
         type: Number,
         required: true,
       },
@@ -27,6 +28,7 @@ const cartSchema = new mongoose.Schema({
   cTotalPrice: {
     type: Number,
     required: true,
+    default: 0,
   },
 }, {
   timestamps: true,

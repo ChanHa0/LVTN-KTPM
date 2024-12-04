@@ -17,7 +17,7 @@ const CartController = {
     updateCartItem: async (req, res) => {
         try {
             const { id, prId } = req.params;
-            const result = await CartService.editToCart(id, prId, req.body);
+            const result = await CartService.updateCartItem(id, prId, req.body);
             if (result.status === 'ERR') {
                 return res.status(404).json(result);
             }
@@ -30,7 +30,7 @@ const CartController = {
     removeFromCart: async (req, res) => {
         try {
             const { id, prId } = req.params;
-            const result = await CartService.deleteToCart(id, prId);
+            const result = await CartService.removeFromCart(id, prId);
             if (result.status === 'ERR') {
                 return res.status(404).json(result);
             }
