@@ -9,7 +9,6 @@ router.get('/all', ProductController.getAllProducts);
 router.get('/:id', ProductController.getDetailProduct);
 router.get('/search', ProductController.searchProducts);
 router.post('/review/:prId', ProductController.createProductReview);
-router.get('/rating/:id', ProductController.getRatingProduct);
-router.get('/comment/:id', ProductController.getCommentProduct);
+router.get('/review/:id', ProductController.getProductReviews);
 
 module.exports = router;

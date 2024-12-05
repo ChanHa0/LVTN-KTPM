@@ -1,7 +1,6 @@
 const User = require('../models/Users');
 const Product = require('../models/Products');
 const Cart = require('../models/Carts');
-const { ObjectId } = require('mongodb');
 
 const CartService = {
     addToCart: async (cartData) => {
@@ -70,12 +69,12 @@ const CartService = {
         }
     },
 
-    updateCartItem: async (id, prId, cartData) => {
+    updateCartItem: async (uId, prId, cartData) => {
         try {
             const { prQuantity } = cartData;
 
             // Tìm giỏ hàng và sản phẩm
-            const cart = await Cart.findById(id);
+            const cart = await Cart.findOne({ uId: uId });
             if (!cart) {
                 return { status: 'ERR', message: 'Không tìm thấy giỏ hàng' };
             }
@@ -109,22 +108,23 @@ const CartService = {
         }
     },
 
-    removeFromCart: async (id, prId) => {
+    removeFromCart: async (uId, prId) => {
         try {
-            const cart = await Cart.findById(id);
+            const cart = await Cart.findOneAndUpdate(
+                { uId: uId },
+                { $pull: { cItems: { prId: prId } } },
+                { new: true }
+            );
+
             if (!cart) {
                 return { status: 'ERR', message: 'Không tìm thấy giỏ hàng' };
             }
 
-            const itemIndex = cart.cItems.findIndex(item => item.prId.toString() === prId.toString());
-            if (itemIndex > -1) {
-                cart.cItems.splice(itemIndex, 1);
-                cart.cTotalPrice = cart.cItems.reduce((total, item) => total + item.prPrice, 0);
-                await cart.save();
-                return { status: 'OK', message: 'Xóa sản phẩm khỏi giỏ hàng thành công' };
-            } else {
-                return { status: 'ERR', message: 'Sản phẩm không tồn tại trong giỏ hàng' };
-            }
+            // Cập nhật tổng giá
+            cart.cTotalPrice = cart.cItems.reduce((total, item) => total + item.prPrice, 0);
+            await cart.save();
+
+            return { status: 'OK', message: 'Xóa sản phẩm khỏi giỏ hàng thành công' };
         } catch (error) {
             console.error('Lỗi removeFromCart:', error);
             return { status: 'ERR', message: 'Lỗi khi xóa sản phẩm khỏi giỏ hàng', error: error.message };

@@ -39,15 +39,9 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  oShippingMethod: {
-    type: String,
-    enum: ["cash_on_delivery", "bank_transfer"],
-    required: true,
-  },
   oPaymentMethod: {
     type: String,
     enum: ["PAYPAL", "COD"],
-    default: "COD",
     required: true,
   },
 }, { timestamps: true, strictPopulate: false })

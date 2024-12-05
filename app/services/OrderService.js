@@ -3,7 +3,7 @@ const Product = require('../models/Products');
 
 const OrderService = {
     createOrder: async (orderData) => {
-        const { uId, oItems, oTotalPrice, oShippingAddress, oShippingMethod, oPaymentMethod } = orderData;
+        const { uId, oItems, oTotalPrice, oShippingAddress, oPaymentMethod } = orderData;
         try {
             // Tạo đơn hàng mới
             const newOrder = await Order.create({
@@ -11,7 +11,6 @@ const OrderService = {
                 oItems,
                 oTotalPrice,
                 oShippingAddress,
-                oShippingMethod,
                 oPaymentMethod,
                 oStatus: 'PENDING', // Đơn hàng mới thường có trạng thái PENDING
             });
@@ -93,6 +92,16 @@ const OrderService = {
             return { status: 'ERR', message: 'Lỗi lấy chi tiết đơn hàng', error: error.message };
         }
     },
+    paypalTransactionComplete: async (req, res) => {
+        try {
+            const { orderID } = req.body;
+            console.log(`Transaction completed with order ID: ${orderID}`);
+            res.status(200).send('Transaction completed');
+        } catch (error) {
+            console.error('Error completing transaction:', error);
+            res.status(500).send('Internal server error');
+        }
+    }
 };
 
 module.exports = OrderService;

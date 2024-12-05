@@ -9,5 +9,6 @@ router.put('/confirm/:id', OrderController.confirmOrder);
 router.put('/cancel/:id', OrderController.cancelOrder);
 router.get('/all', OrderController.getAllOrders);
 router.get('/:id', OrderController.getDetailOrder);
+router.post('/paypal/transaction-complete', OrderController.paypalTransactionComplete);
 
 module.exports = router;

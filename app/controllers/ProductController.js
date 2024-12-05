@@ -79,7 +79,8 @@ const ProductController = {
     // Tạo đánh giá sản phẩm
     createProductReview: async (req, res) => {
         try {
-            const result = await ProductService.createProductReview(req.body);
+            const { id } = req.params;
+            const result = await ProductService.createProductReview(id, req.body);
             if (result.status === 'ERR') {
                 return res.status(404).json(result);
             }
@@ -88,32 +89,15 @@ const ProductController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Lấy đánh giá sản phẩm
-    getRatingProduct: async (req, res) => {
+    getProductReviews: async (req, res) => {
         try {
             const { id } = req.params;
-            const result = await ProductService.getRatingProduct(id);
-            if (result.status === 'ERR') {
-                return res.status(404).json(result);
-            }
+            const result = await ProductService.getProductReviews(id);
             res.status(200).json(result);
         } catch (error) {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
-    },
-    // Lấy bình luận sản phẩm
-    getCommentProduct: async (req, res) => {
-        try {
-            const { id } = req.params;
-            const result = await ProductService.getCommentProduct(id);
-            if (result.status === 'ERR') {
-                return res.status(404).json(result);
-            }
-            res.status(200).json(result);
-        } catch (error) {
-            res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
-        }
-    },
+    }
 };
 
 module.exports = ProductController;

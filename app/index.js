@@ -31,11 +31,13 @@ const ProductRouter = require('./routes/ProductRouter')
 const CartRouter = require('./routes/CartRouter')
 const OrderRouter = require('./routes/OrderRouter')
 const StatisticRouter = require('./routes/StatisticRouter')
+
 app.use('/api/user', UserRouter)
 app.use('/api/product', ProductRouter)
 app.use('/api/cart', CartRouter)
 app.use('/api/order', OrderRouter)
 app.use('/api/statistics', StatisticRouter)
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

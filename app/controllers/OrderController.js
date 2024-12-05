@@ -90,6 +90,11 @@ const OrderController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
+    paypalTransactionComplete: async (req, res) => {
+        const { orderID } = req.body;
+        console.log(`Transaction completed with order ID: ${orderID}`);
+        res.status(200).send('Transaction completed');
+    },
 };
 
 module.exports = OrderController;
