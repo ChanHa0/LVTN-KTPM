@@ -245,16 +245,15 @@ const ManageUsers = () => {
                                             onChange={handleInputChange}
                                             required
                                         />
-                                        {!editingUser && (
-                                            <InputField
-                                                label="Mật khẩu"
-                                                name="uPassword"
-                                                type="password"
-                                                value={formData.uPassword}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        )}
+                                        <InputField
+                                            label="Mật khẩu"
+                                            name="uPassword"
+                                            type="password"
+                                            value={formData.uPassword}
+                                            onChange={handleInputChange}
+                                            required={!editingUser}
+                                            placeholder={editingUser ? "Để trống nếu không muốn thay đổi mật khẩu" : ""}
+                                        />
                                         <InputField
                                             label="Số điện thoại"
                                             name="uPhone"

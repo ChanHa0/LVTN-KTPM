@@ -14,6 +14,7 @@ import ManageProducts from './pages/ManageProducts';
 import ManageUsers from "./pages/ManageUsers";
 import ManageOrders from './pages/ManageOrders';
 import MyOrders from './pages/MyOrders';
+import About from './pages/About';
 
 export const routes = [
     {
@@ -35,6 +36,10 @@ export const routes = [
     {
         path: '/product',
         element: <MainLayout><Product /></MainLayout>
+    },
+    {
+        path: '/about',
+        element: <MainLayout><About /></MainLayout>
     },
     {
         path: '/productdetail/:id',

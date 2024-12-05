@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { FaShoppingCart } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { fetchProductDetail } from '../redux/slices/productSlice';
 import { addToCart } from '../redux/slices/cartSlice';
+import ProductReview from '../components/ProductReview';
+import productApi from '../api/productApi';
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -14,12 +16,44 @@ const ProductDetail = () => {
     const { items } = useSelector((state) => state.cart);
     const [quantity, setQuantity] = React.useState(1);
     const user = JSON.parse(localStorage.getItem('user'));
+    const [reviews, setReviews] = useState([]);
 
     useEffect(() => {
-        if (id) {
-            dispatch(fetchProductDetail(id));
+        console.log('Product ID from URL:', id);
+
+        if (!id || id.length !== 24) {
+            console.error('Invalid product ID format');
+            toast.error('ID sản phẩm không hợp lệ');
+            navigate('/');
+            return;
         }
-    }, [id, dispatch]);
+
+        dispatch(fetchProductDetail(id));
+    }, [id, dispatch, navigate]);
+
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                if (!id || id.length !== 24) {
+                    console.error('Invalid product ID format');
+                    return;
+                }
+
+                const response = await productApi.getProductReviews(id);
+                if (response.status === 'OK') {
+                    setReviews(response.data);
+                } else {
+                    console.error('Error fetching reviews:', response.message);
+                }
+            } catch (error) {
+                console.error('Error fetching reviews:', error);
+            }
+        };
+
+        if (id) {
+            fetchReviews();
+        }
+    }, [id]);
 
     const handleAddToCart = async () => {
         if (!user || !user._id) {
@@ -49,6 +83,21 @@ const ProductDetail = () => {
         } catch (error) {
             console.error("Error buying now:", error);
             toast.error('Không thể mua ngay');
+        }
+    };
+
+    const handleReviewSubmit = async (newReview) => {
+        try {
+            if (!id || id.length !== 24) {
+                toast.error('ID sản phẩm không hợp lệ');
+                return;
+            }
+
+            setReviews(prevReviews => [...prevReviews, newReview]);
+            toast.success('Đánh giá của bạn đã được ghi nhận');
+        } catch (error) {
+            console.error('Error handling review submit:', error);
+            toast.error('Có lỗi xảy ra khi gửi đánh giá');
         }
     };
 
@@ -118,7 +167,7 @@ const ProductDetail = () => {
                                 className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                             >
                                 <FaShoppingCart className="w-5 h-5" />
-                                <span>Thêm vào giỏ hàng</span>
+                                <span>Thêm vào gi hàng</span>
                             </button>
                             <button
                                 onClick={handleBuyNow}
@@ -131,6 +180,51 @@ const ProductDetail = () => {
                     </div>
                 </div>
             )}
+            <div className="mt-8 w-full">
+                <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h3 className="text-xl font-semibold mb-4">Đánh giá sản phẩm</h3>
+                    <div className="space-y-4 mb-6">
+                        {reviews.map((review, index) => (
+                            <div key={index} className="border-b pb-4">
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-medium">{review.uId.uName}</span>
+                                        <div className="flex text-yellow-400">
+                                            {[...Array(5)].map((_, i) => (
+                                                <span key={i} className={i < review.prRating ? 'text-yellow-400' : 'text-gray-300'}>
+                                                    ★
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <span className="text-gray-600 text-sm">
+                                        {new Date(review.createdAt).toLocaleDateString()}
+                                    </span>
+                                </div>
+                                <p className="text-gray-700">{review.prComment}</p>
+                            </div>
+                        ))}
+                        {reviews.length === 0 && (
+                            <p className="text-gray-500 text-center">Chưa có đánh giá nào</p>
+                        )}
+                    </div>
+                    {user ? (
+                        <ProductReview
+                            prId={id}
+                            onSubmit={handleReviewSubmit}
+                        />
+                    ) : (
+                        <p className="text-center text-gray-600">
+                            Vui lòng <button
+                                onClick={() => navigate('/login')}
+                                className="text-blue-600 hover:underline"
+                            >
+                                đăng nhập
+                            </button> để đánh giá sản phẩm
+                        </p>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };

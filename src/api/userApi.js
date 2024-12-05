@@ -54,6 +54,11 @@ const userApi = {
             throw error;
         }
     },
+
+    updateProfile: (data) => {
+        const url = `/api/user/${data.id}`;
+        return axiosClient.put(url, data);
+    }
 };
 
 export default userApi;

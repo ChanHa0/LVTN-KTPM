@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import userApi from '../api/userApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateProfile, setUsers } from '../redux/slices/userSlice';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-    const [user, setUser] = useState(null);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const user = useSelector(state => state.user.users[0]);
+    const loading = useSelector(state => state.user.loading);
     const [isEditing, setIsEditing] = useState(false);
-    const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({
         uName: '',
         uEmail: '',
@@ -13,40 +16,37 @@ const Profile = () => {
         uAddress: '',
         uRole: ''
     });
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
 
     useEffect(() => {
-        const fetchUserDetails = async () => {
-            try {
-                const userId = localStorage.getItem('userId');
-                if (!userId) {
-                    toast.error('Vui lòng đăng nhập');
-                    return;
-                }
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            dispatch(setUsers([parsedUser]));
+            setFormData({
+                uName: parsedUser.uName || '',
+                uEmail: parsedUser.uEmail || '',
+                uPhone: parsedUser.uPhone || '',
+                uAddress: parsedUser.uAddress || '',
+                uRole: parsedUser.uRole || ''
+            });
+        } else {
+            navigate('/login');
+        }
+    }, [dispatch, navigate]);
 
-                const result = await userApi.getDetailUser(userId);
-                if (result.status === 200) {
-                    const userData = result.data;
-                    setUser(userData);
-                    setFormData({
-                        uName: userData.uName || '',
-                        uEmail: userData.uEmail || '',
-                        uPhone: userData.uPhone || '',
-                        uAddress: userData.uAddress || '',
-                        uRole: userData.uRole || ''
-                    });
-                } else {
-                    toast.error('Không thể lấy thông tin người dùng');
-                }
-            } catch (error) {
-                toast.error('Không thể lấy thông tin người dùng');
-                console.error('Error fetching user details:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUserDetails();
-    }, []);
+    useEffect(() => {
+        if (user) {
+            setFormData({
+                uName: user.uName || '',
+                uEmail: user.uEmail || '',
+                uPhone: user.uPhone || '',
+                uAddress: user.uAddress || '',
+                uRole: user.uRole || ''
+            });
+        }
+    }, [user]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -58,26 +58,56 @@ const Profile = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const userId = localStorage.getItem('userId');
-            const result = await userApi.updateUser(userId, formData);
+        setError(null);
+        setSuccessMessage(null);
 
-            if (result.status === 200) {
-                setUser(result.data);
-                toast.success('Cập nhật thông tin thành công!');
-                setIsEditing(false);
-            } else {
-                toast.error('Lỗi khi cập nhật thông tin');
+        try {
+            const userId = user?._id || JSON.parse(localStorage.getItem('user'))?._id;
+            if (!userId) {
+                setError('Vui lòng đăng nhập');
+                return;
             }
+
+            await dispatch(updateProfile({ id: userId, ...formData }))
+                .unwrap()
+                .then((updatedUser) => {
+                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                    setSuccessMessage('Cập nhật thông tin thành công');
+                    setIsEditing(false);
+                    setTimeout(() => {
+                        setSuccessMessage(null);
+                    }, 3000);
+                })
+                .catch((error) => {
+                    setError(`Lỗi khi cập nhật thông tin: ${error}`);
+                    console.error('Error updating user:', error);
+                });
+
         } catch (error) {
-            toast.error('Lỗi khi cập nhật thông tin');
+            setError(`Lỗi khi cập nhật thông tin: ${error.message}`);
             console.error('Error updating user:', error);
         }
     };
 
+    if (loading) {
+        return <div>Đang tải thông tin...</div>;
+    }
+
     return (
         <div className="min-h-screen bg-gray-100 py-8">
             <div className="max-w-4xl mx-auto">
+                {error && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                        {error}
+                    </div>
+                )}
+
+                {successMessage && (
+                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+                        {successMessage}
+                    </div>
+                )}
+
                 {!isEditing ? (
                     <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                         <div className="flex items-start">
@@ -188,7 +218,11 @@ const Profile = () => {
                         <div className="flex justify-end">
                             <button
                                 type="button"
-                                onClick={() => setIsEditing(false)}
+                                onClick={() => {
+                                    setIsEditing(false);
+                                    setError(null);
+                                    setSuccessMessage(null);
+                                }}
                                 className="mr-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
                             >
                                 Hủy

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import orderApi from '../api/orderApi';
 import cartApi from '../api/cartApi';
+import { PayPalButton } from "react-paypal-button-v2";
 
 const Checkout = () => {
     const navigate = useNavigate();
@@ -42,22 +43,13 @@ const Checkout = () => {
         return sum + (price * quantity);
     }, 0);
 
-    const handleOrderSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-
-        if (!shippingAddress.trim()) {
-            toast.error('Vui lòng nhập địa chỉ giao hàng');
-            setLoading(false);
-            return;
-        }
-
+    const createOrder = async () => {
         const orderData = {
             uId: user._id,
             oStatus: "PENDING",
             oTotalPrice: String(totalAmount + 30000),
             oShippingAddress: shippingAddress.trim(),
-            oShippingMethod: shippingMethod,
+            oPaymentMethod: shippingMethod === 'paypal' ? 'PAYPAL' : 'COD',
             items: cartItems.map(item => ({
                 prId: item.id,
                 odQuantity: item.quantity,
@@ -66,6 +58,7 @@ const Checkout = () => {
         };
 
         try {
+            console.log('Creating order with data:', orderData);
             const response = await orderApi.createOrder(orderData);
             if (response.status === 'OK') {
                 try {
@@ -82,6 +75,7 @@ const Checkout = () => {
                 alert('Đặt hàng thành công!');
                 navigate('/product');
             } else {
+                console.error('Order creation failed:', response.message);
                 alert(response.message || 'Đặt hàng thất bại');
             }
         } catch (error) {
@@ -89,6 +83,21 @@ const Checkout = () => {
             alert('Đặt hàng thất bại');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleOrderSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        if (!shippingAddress.trim()) {
+            toast.error('Vui lòng nhập địa chỉ giao hàng');
+            setLoading(false);
+            return;
+        }
+
+        if (shippingMethod === 'cash_on_delivery') {
+            await createOrder();
         }
     };
 
@@ -128,7 +137,6 @@ const Checkout = () => {
                                 </div>
                             ))}
                         </div>
-
                     </div>
 
                     <form onSubmit={handleOrderSubmit} className="lg:w-1/2 bg-white p-6 rounded-lg shadow">
@@ -166,24 +174,51 @@ const Checkout = () => {
                                         <input
                                             type="radio"
                                             name="paymentMethod"
-                                            value="bank_transfer"
-                                            checked={shippingMethod === 'bank_transfer'}
-                                            onChange={(e) => setShippingMethod(e.target.value)}
-                                            className="h-4 w-4 text-blue-600"
-                                        />
-                                        <span>Chuyển khoản ngân hàng</span>
-                                    </label>
-                                    <label className="flex items-center space-x-3">
-                                        <input
-                                            type="radio"
-                                            name="paymentMethod"
                                             value="paypal"
                                             checked={shippingMethod === 'paypal'}
                                             onChange={(e) => setShippingMethod(e.target.value)}
                                             className="h-4 w-4 text-blue-600"
                                         />
-                                        <span>PayPal</span>
+                                        <span>Thanh toán bằng PayPal</span>
                                     </label>
+                                    {shippingMethod === 'paypal' && (
+                                        <PayPalButton
+                                            style={{
+                                                layout: 'vertical',
+                                                color: 'blue',
+                                                shape: 'rect',
+                                                label: 'paypal'
+                                            }}
+                                            createOrder={(data, actions) => {
+                                                return actions.order.create({
+                                                    purchase_units: [{
+                                                        amount: {
+                                                            value: (totalAmount + 30000).toString()
+                                                        }
+                                                    }]
+                                                });
+                                            }}
+                                            onApprove={async (data, actions) => {
+                                                return actions.order.capture().then(async (details) => {
+                                                    alert("Transaction completed by " + details.payer.name.given_name);
+
+                                                    // Gửi thông tin giao dịch đến backend
+                                                    await fetch("http://localhost:5000/api/order/paypal-transaction-complete", {
+                                                        method: "POST",
+                                                        headers: {
+                                                            "Content-Type": "application/json"
+                                                        },
+                                                        body: JSON.stringify({
+                                                            orderID: data.orderID
+                                                        })
+                                                    });
+
+                                                    // Tạo đơn hàng sau khi giao dịch PayPal thành công
+                                                    await createOrder();
+                                                });
+                                            }}
+                                        />
+                                    )}
                                 </div>
                             </div>
                         </div>

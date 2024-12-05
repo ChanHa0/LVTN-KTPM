@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import productApi from '../api/productApi';
-import bookBackground from '../assets/images/book-background.jpg';
+// import bookBackground from '../assets/images/book-background.jpg';
 import ProductCard from '../components/ProductCard';
 import MoreInfor from '../components/MoreInfor';
 
@@ -37,7 +37,7 @@ const Home = () => {
     }, []);
 
     return (
-        <div className="bg-white text-black min-h-screen bg-cover bg-fixed" style={{ backgroundImage: `url(${bookBackground})` }}>
+        <div className="bg-white text-black min-h-screen bg-cover bg-fixed" style={{ backgroundImage: 'linear-gradient(to right, #F3DADF , #FFE3D8)' }}>
             <section className="text-white py-16 px-8">
                 <div className="max-w-7xl mx-auto text-center bg-blue-500 bg-opacity-80 p-8 rounded-lg shadow-lg">
                     <h1 className="text-5xl font-bold">Chào Mừng Bạn Đến Với Cửa Hàng Sách</h1>
@@ -45,7 +45,7 @@ const Home = () => {
                         Tìm kiếm những cuốn sách bạn yêu thích và khám phá thêm nhiều tác phẩm mới.
                     </p>
                     <button
-                        onClick={() => navigate('/product')}
+                        onClick={() => navigate('/about')}
                         className="mt-6 bg-white text-blue-500 px-6 py-3 rounded-lg hover:bg-gray-100 transition-transform transform hover:scale-105"
                     >
                         Khám phá ngay

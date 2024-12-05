@@ -64,19 +64,17 @@ const productApi = {
             throw error;
         }
     },
-
-    getRatingProduct: async (id) => {
+    createProductReview: async (prId, reviewData) => {
         try {
-            const response = await axiosClient.get(`api/product/rating/${id}`);
+            const response = await axiosClient.post(`api/product/review/${prId}`, reviewData);
             return response;
         } catch (error) {
             throw error;
         }
     },
-
-    getCommentProduct: async (id) => {
+    getProductReviews: async (prId) => {
         try {
-            const response = await axiosClient.get(`api/product/comment/${id}`);
+            const response = await axiosClient.get(`api/product/review/${prId}`);
             return response;
         } catch (error) {
             throw error;

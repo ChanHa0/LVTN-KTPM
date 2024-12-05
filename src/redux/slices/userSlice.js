@@ -42,6 +42,32 @@ export const registerUser = createAsyncThunk(
     }
 );
 
+export const updateProfile = createAsyncThunk(
+    'user/updateProfile',
+    async (formData, { rejectWithValue }) => {
+        try {
+            const userData = {
+                id: formData.id,
+                uName: formData.uName,
+                uEmail: formData.uEmail,
+                uPhone: formData.uPhone,
+                uAddress: formData.uAddress,
+                uRole: formData.uRole
+            };
+
+            const response = await userApi.updateProfile(userData);
+            if (response.status === 'OK') {
+                return response.data.user;
+            } else {
+                return rejectWithValue(response.message || 'Cập nhật thông tin thất bại');
+            }
+        } catch (error) {
+            console.error('Update profile error:', error);
+            return rejectWithValue(error.response?.data?.message || error.message || 'Cập nhật thông tin thất bại');
+        }
+    }
+);
+
 const userSlice = createSlice({
     name: 'user',
     initialState: { users: [], error: null, loading: false },
@@ -54,10 +80,12 @@ const userSlice = createSlice({
         },
         updateUser: (state, action) => {
             const { id, ...updatedUser } = action.payload;
-            state.users = state.users.map(user => user.id === id ? { ...user, ...updatedUser } : user);
+            state.users = state.users.map(user =>
+                user._id === id ? { ...user, ...updatedUser } : user
+            );
         },
         deleteUser: (state, action) => {
-            state.users = state.users.filter(user => user.id !== action.payload);
+            state.users = state.users.filter(user => user._id !== action.payload);
         },
     },
     extraReducers: (builder) => {
@@ -83,6 +111,21 @@ const userSlice = createSlice({
                 state.users.push(action.payload);
             })
             .addCase(registerUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(updateProfile.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateProfile.fulfilled, (state, action) => {
+                state.loading = false;
+                const updatedUser = action.payload;
+                state.users = state.users.map(user =>
+                    user._id === updatedUser._id ? updatedUser : user
+                );
+            })
+            .addCase(updateProfile.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

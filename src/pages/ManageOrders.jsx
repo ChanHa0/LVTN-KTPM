@@ -28,7 +28,7 @@ const ManageOrders = () => {
                     oTotalAmount: order.oTotalPrice,
                     status: order.oStatus,
                     oShippingAddress: order.oShippingAddress,
-                    oShippingMethod: order.oShippingMethod
+                    oPaymentMethod: order.oPaymentMethod,
                 }));
                 setOrders(formattedOrders);
             } else {
@@ -153,7 +153,7 @@ const ManageOrders = () => {
                                 <thead className="bg-gray-50">
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mã đơn</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Khách hàng</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phương thức thanh toán</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ngày đặt</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tổng tiền</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
@@ -176,7 +176,7 @@ const ManageOrders = () => {
                                                     {order._id}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {order.uId}
+                                                    {order.oPaymentMethod === 'COD' ? 'Thanh toán khi nhận hàng' : 'Thanh toán qua PayPal'}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                     {new Date(order.oOrderDate).toLocaleDateString('vi-VN')}
@@ -232,8 +232,7 @@ const ManageOrders = () => {
                         <p><strong>Mã đơn hàng:</strong> {orderDetails._id}</p>
                         <p><strong>Khách hàng:</strong> {orderDetails.uId}</p>
                         <p><strong>Địa chỉ giao hàng:</strong> {orderDetails.oShippingAddress}</p>
-                        <p><strong>Phương thức giao hàng:</strong> {orderDetails.oShippingMethod}</p>
-                        <p><strong>Phương thức thanh toán:</strong> {orderDetails.oPaymentMethod}</p>
+                        <p><strong>Phương thức thanh toán:</strong> {orderDetails.oPaymentMethod === 'COD' ? 'Thanh toán khi nhận hàng' : 'Thanh toán qua PayPal'}</p>
                         <p><strong>Tổng tiền:</strong> {orderDetails.oTotalPrice.toLocaleString('vi-VN')}₫</p>
                         <p><strong>Trạng thái:</strong> {orderDetails.oStatus}</p>
                         <h3 className="text-lg font-semibold text-gray-800 mt-4">Sản phẩm:</h3>
