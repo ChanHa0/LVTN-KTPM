@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/LVTN-KTPM/static/css/main.1c399cc4.css",
+    "main.js": "/LVTN-KTPM/static/js/main.0e383eef.js",
+    "index.html": "/LVTN-KTPM/index.html",
+    "main.1c399cc4.css.map": "/LVTN-KTPM/static/css/main.1c399cc4.css.map",
+    "main.0e383eef.js.map": "/LVTN-KTPM/static/js/main.0e383eef.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1c399cc4.css",
+    "static/js/main.0e383eef.js"
+  ]
+}
