@@ -119,19 +119,6 @@ const UserService = {
             return { status: 'ERR', message: 'Lỗi lấy chi tiết người dùng', error: error.message };
         }
     },
-    updateProfile: async (id, userData) => {
-        try {
-            const user = await User.findById(id);
-            if (!user) {
-                return { status: 'ERR', message: 'Không tìm thấy người dùng' };
-            }
-            Object.assign(user, userData);
-            await user.save();
-            return { status: 'OK', message: 'Cập nhật thông tin thành công', data: user };
-        } catch (error) {
-            return { status: 'ERR', message: 'Lỗi cập nhật thông tin', error: error.message };
-        }
-    }
 };
 
 module.exports = UserService;

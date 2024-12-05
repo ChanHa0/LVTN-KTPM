@@ -76,19 +76,6 @@ const UserController = {
             res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
         }
     },
-    // Cập nhật thông tin người dùng
-    updateProfile: async (req, res) => {
-        try {
-            const { id } = req.params;
-            const result = await UserService.updateProfile(id, req.body);
-            if (result.status === 'ERR') {
-                return res.status(404).json(result);
-            }
-            res.status(200).json(result);
-        } catch (error) {
-            res.status(500).json({ status: 'ERR', message: 'Lỗi server', error: error.message });
-        }
-    }
 };
 
 module.exports = UserController;
