@@ -135,7 +135,7 @@ const CartService = {
         try {
             const cart = await Cart.findOne({ uId: uId }).populate('cItems.prId');
             if (!cart) {
-                return { status: 'OK', message: 'Giỏ hàng trống', data: null };
+                return { status: 'ERR', message: 'Giỏ hàng trống', data: null };
             }
             return { status: 'OK', message: 'Lấy thông tin giỏ hàng thành công', data: cart };
         } catch (error) {
@@ -143,15 +143,6 @@ const CartService = {
             return { status: 'ERR', message: 'Lỗi khi lấy giỏ hàng', error: error.message };
         }
     },
-
-    addMultipleToCart: async (cartData) => {
-        try {
-            const result = await CartService.addToCart(cartData);
-            return result;
-        } catch (error) {
-            return { status: 'ERR', message: 'Lỗi khi thêm nhiều sản phẩm vào giỏ hàng', error: error.message };
-        }
-    }
 };
 
 module.exports = CartService;

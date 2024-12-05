@@ -41,7 +41,7 @@ const orderSchema = new mongoose.Schema({
   },
   oShippingMethod: {
     type: String,
-    enum: ["Giao hàng tiêu chuẩn", "Giao hàng nhanh"],
+    enum: ["cash_on_delivery", "bank_transfer"],
     required: true,
   },
   oPaymentMethod: {

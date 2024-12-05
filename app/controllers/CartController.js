@@ -52,18 +52,6 @@ const CartController = {
             res.status(500).json({ status: "ERR", message: "Lỗi server", error: error.message });
         }
     },
-    // Thêm nhiều sản phẩm vào giỏ hàng
-    addMultipleToCart: async (req, res) => {
-        try {
-            const result = await CartService.addMultipleToCart(req.body);
-            if (result.status === 'ERR') {
-                return res.status(404).json(result);
-            }
-            res.status(200).json(result);
-        } catch (error) {
-            res.status(500).json({ status: "ERR", message: "Lỗi server", error: error.message });
-        }
-    }
 };
 
 module.exports = CartController;
