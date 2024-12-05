@@ -4,6 +4,16 @@ import { FaPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../components/LoadingSpinner';
 import productApi from '../api/productApi';
+import InputField from '../components/InputField';
+const categories = [
+    'Sách văn học',
+    'Sách khoa học',
+    'Sách kinh tế',
+    'Tiểu thuyết',
+    'Truyện tranh',
+    'Sách ngoại ngữ',
+    'Sách thiếu nhi'
+];
 
 const ManageProducts = () => {
     const [products, setProducts] = useState([]);
@@ -21,27 +31,22 @@ const ManageProducts = () => {
         prPrice: ''
     });
 
-    const categories = [
-        'Sách văn học',
-        'Sách thiếu nhi',
-        'Sách kinh tế',
-        'Sách kỹ năng sống',
-        'Sách ngoại ngữ',
-        'Sách giáo khoa'
-    ];
-
     useEffect(() => {
         fetchProducts();
     }, []);
 
     const fetchProducts = async () => {
         try {
+            setLoading(true);
             const response = await productApi.getAllProducts();
             if (response.status === 'OK') {
                 setProducts(response.data);
             }
         } catch (error) {
             console.error('Lỗi khi lấy danh sách sản phẩm:', error);
+            toast.error('Không thể tải danh sách sản phẩm');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -181,68 +186,54 @@ const ManageProducts = () => {
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sản phẩm</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Danh mục</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng</th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase w-2/12">Sản phẩm</th>
+                                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase w-2/12">Tác giả</th>
+                                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase w-2/12">Danh mục</th>
+                                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase w-2/12">Giá</th>
+                                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase w-2/12">Số lượng</th>
+                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase w-2/12">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {filteredProducts.length === 0 ? (
                                         <tr>
-                                            <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                                            <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
                                                 Không có sản phẩm nào
                                             </td>
                                         </tr>
                                     ) : (
                                         filteredProducts.map((product) => (
                                             <tr key={product._id} className="hover:bg-gray-100 transition duration-150 ease-in-out">
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center">
-                                                        <div className="h-16 w-16 flex-shrink-0">
-                                                        </div>
-                                                        <div className="ml-4">
-                                                            <div className="text-sm font-medium text-gray-900 line-clamp-2">
-                                                                {product.prTitle}
-                                                            </div>
-                                                            <div className="text-sm text-gray-500">
-                                                                {product.prAuthor}
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.prTitle}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">{product.prAuthor}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">{product.prCategory}</span>
                                                 </td>
-                                                <td className="px-6 py-4">
-                                                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                                        {product.prCategory}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 text-sm text-gray-900">
+                                                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                                                     {new Intl.NumberFormat('vi-VN', {
                                                         style: 'currency',
                                                         currency: 'VND'
                                                     }).format(product.prPrice)}
                                                 </td>
-                                                <td className="px-6 py-4 text-sm text-gray-900">
-                                                    <span className={`${product.prStockQuantity <= 10 ? 'text-red-600' : 'text-gray-900'
-                                                        }`}>
+                                                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
+                                                    <span className={`${product.prStockQuantity <= 10 ? 'text-red-600' : 'text-gray-900'}`}>
                                                         {product.prStockQuantity}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 text-right space-x-3">
+                                                <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
                                                     <button
                                                         onClick={() => handleEdit(product)}
                                                         className="text-indigo-600 hover:text-indigo-900 transition duration-150 ease-in-out"
                                                         title="Sửa"
                                                     >
-                                                        <FaEdit className="inline-block w-5 h-5" />
+                                                        <FaEdit className="inline-block w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(product._id)}
                                                         className="text-red-600 hover:text-red-900 transition duration-150 ease-in-out"
                                                         title="Xóa"
                                                     >
-                                                        <FaTrash className="inline-block w-5 h-5" />
+                                                        <FaTrash className="inline-block w-4 h-4" />
                                                     </button>
                                                 </td>
                                             </tr>
@@ -262,28 +253,20 @@ const ManageProducts = () => {
                                 </h2>
                                 <form onSubmit={handleSubmit} className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Tên sách</label>
-                                            <input
-                                                type="text"
-                                                name="prTitle"
-                                                value={formData.prTitle}
-                                                onChange={handleInputChange}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Tác giả</label>
-                                            <input
-                                                type="text"
-                                                name="prAuthor"
-                                                value={formData.prAuthor}
-                                                onChange={handleInputChange}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                                required
-                                            />
-                                        </div>
+                                        <InputField
+                                            label="Tên sách"
+                                            name="prTitle"
+                                            value={formData.prTitle}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                        <InputField
+                                            label="Tác giả"
+                                            name="prAuthor"
+                                            value={formData.prAuthor}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700">Danh mục</label>
                                             <select
@@ -299,41 +282,29 @@ const ManageProducts = () => {
                                                 ))}
                                             </select>
                                         </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">URL Hình ảnh</label>
-                                            <input
-                                                type="text"
-                                                name="prImage"
-                                                value={formData.prImage}
-                                                onChange={handleInputChange}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Giá</label>
-                                            <input
-                                                type="number"
-                                                name="prPrice"
-                                                value={formData.prPrice}
-                                                onChange={handleInputChange}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                                min="0"
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Số lượng</label>
-                                            <input
-                                                type="number"
-                                                name="prStockQuantity"
-                                                value={formData.prStockQuantity}
-                                                onChange={handleInputChange}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                                min="0"
-                                                required
-                                            />
-                                        </div>
+                                        <InputField
+                                            label="URL Hình ảnh"
+                                            name="prImage"
+                                            value={formData.prImage}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                        <InputField
+                                            label="Giá"
+                                            name="prPrice"
+                                            type="number"
+                                            value={formData.prPrice}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                        <InputField
+                                            label="Số lượng"
+                                            name="prStockQuantity"
+                                            type="number"
+                                            value={formData.prStockQuantity}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Mô tả</label>
@@ -352,16 +323,15 @@ const ManageProducts = () => {
                                                 setShowForm(false);
                                                 resetForm();
                                             }}
-                                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                                            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
                                         >
                                             Hủy
                                         </button>
                                         <button
                                             type="submit"
-                                            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
-                                            disabled={loading}
+                                            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
                                         >
-                                            {loading ? 'Đang xử lý...' : (editingProduct ? 'Cập nhật' : 'Thêm mới')}
+                                            {editingProduct ? 'Cập nhật' : 'Thêm mới'}
                                         </button>
                                     </div>
                                 </form>

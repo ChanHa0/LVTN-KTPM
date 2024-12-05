@@ -1,12 +1,11 @@
 import axiosClient from './axiosClient';
 
 const cartApi = {
-    addToCart: async (uId, prId, cdQuantity) => {
+    addToCart: async (uId, products) => {
         try {
             const response = await axiosClient.post('api/cart/', {
                 uId,
-                prId,
-                cdQuantity
+                products
             });
             return response;
         } catch (error) {
@@ -14,11 +13,10 @@ const cartApi = {
         }
     },
 
-    updateCartItem: async (cId, prId, cdQuantity) => {
+    updateCartItem: async (uId, prId, prQuantity) => {
         try {
-            const response = await axiosClient.put(`api/cart/${cId}`, {
-                prId,
-                cdQuantity
+            const response = await axiosClient.put(`api/cart/${uId}/${prId}`, {
+                prQuantity
             });
             return response;
         } catch (error) {
@@ -26,9 +24,9 @@ const cartApi = {
         }
     },
 
-    removeFromCart: async (cId, prId) => {
+    removeFromCart: async (uId, prId) => {
         try {
-            const response = await axiosClient.delete(`api/cart/${cId}/${prId}`);
+            const response = await axiosClient.delete(`api/cart/${uId}/${prId}`);
             return response;
         } catch (error) {
             throw error;
@@ -38,23 +36,16 @@ const cartApi = {
     getCart: async (uId) => {
         try {
             const response = await axiosClient.get(`api/cart/${uId}`);
-            return response;
+            if (response.status === 'OK' && response.data) {
+                return response.data;
+            } else {
+                throw new Error('Không tìm thấy giỏ hàng');
+            }
         } catch (error) {
+            console.error('Error fetching cart:', error);
             throw error;
         }
     },
-
-    addMultipleToCart: async (uId, products) => {
-        try {
-            const response = await axiosClient.post('api/cart/multiple', {
-                uId,
-                products
-            });
-            return response;
-        } catch (error) {
-            throw error;
-        }
-    }
 };
 
 export default cartApi;

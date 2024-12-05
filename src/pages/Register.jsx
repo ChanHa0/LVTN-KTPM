@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import userApi from '../api/userApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerUser } from '../redux/slices/userSlice';
 
 const Register = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { loading, error } = useSelector(state => state.user);
     const [formData, setFormData] = useState({
         uName: '',
         uEmail: '',
         uPassword: '',
         uConfirmPassword: ''
     });
-    const [loading, setLoading] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -23,59 +25,54 @@ const Register = () => {
 
     const validateForm = () => {
         if (!formData.uName.trim()) {
-            toast.error('Vui lòng nhập họ tên');
             return false;
         }
         if (!formData.uEmail.trim()) {
-            toast.error('Vui lòng nhập email');
             return false;
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formData.uEmail)) {
-            toast.error('Email không hợp lệ');
             return false;
         }
         if (!formData.uPassword) {
-            toast.error('Vui lòng nhập mật khẩu');
             return false;
         }
         if (formData.uPassword.length < 6) {
-            toast.error('Mật khẩu phải có ít nhất 6 ký tự');
             return false;
         }
         if (formData.uPassword !== formData.uConfirmPassword) {
-            toast.error('Mật khẩu xác nhận không khớp');
             return false;
         }
         return true;
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         if (!validateForm()) return;
 
-        setLoading(true);
-        try {
-            const response = await userApi.registerUser({
-                uName: formData.uName.trim(),
-                uEmail: formData.uEmail.trim().toLowerCase(),
-                uPassword: formData.uPassword
-            });
-
-            if (response.status === 'OK') {
-                toast.success('Đăng ký thành công!');
+        dispatch(registerUser(formData)).then((result) => {
+            if (registerUser.fulfilled.match(result)) {
+                setSuccessMessage('Đăng ký thành công!');
                 setTimeout(() => {
                     navigate('/login');
                 }, 1500);
-            } else {
-                throw new Error(response.message || 'Đăng ký thất bại');
             }
-        } catch (error) {
-            toast.error(error.message || 'Có lỗi xảy ra khi đăng ký');
-        } finally {
-            setLoading(false);
-        }
+        });
     };
+
+    const renderInput = (id, label, type = 'text') => (
+        <div className="mb-4">
+            <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+            <input
+                type={type}
+                id={id}
+                value={formData[id]}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder={`Nhập ${label.toLowerCase()}`}
+            />
+        </div>
+    );
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -83,60 +80,15 @@ const Register = () => {
                 <h2 className="text-center text-3xl font-extrabold text-gray-900 mb-8">
                     Đăng ký
                 </h2>
+
                 <div className="bg-white p-8 rounded-lg shadow-md">
+                    {error && <div className="text-red-500 mb-4">{error}</div>}
+                    {successMessage && <div className="text-green-500 mb-4">{successMessage}</div>}
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="mb-4">
-                            <label htmlFor="uName" className="block text-sm font-medium text-gray-700 mb-1">
-                                Họ tên
-                            </label>
-                            <input
-                                type="text"
-                                id="uName"
-                                value={formData.uName}
-                                onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                placeholder="Nhập họ tên"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="uEmail" className="block text-sm font-medium text-gray-700 mb-1">
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                id="uEmail"
-                                value={formData.uEmail}
-                                onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                placeholder="Nhập email"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="uPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                                Mật khẩu
-                            </label>
-                            <input
-                                type="password"
-                                id="uPassword"
-                                value={formData.uPassword}
-                                onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                placeholder="Nhập mật khẩu"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="uConfirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                                Xác nhận mật khẩu
-                            </label>
-                            <input
-                                type="password"
-                                id="uConfirmPassword"
-                                value={formData.uConfirmPassword}
-                                onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                placeholder="Nhập lại mật khẩu"
-                            />
-                        </div>
+                        {renderInput('uName', 'Họ tên')}
+                        {renderInput('uEmail', 'Email', 'email')}
+                        {renderInput('uPassword', 'Mật khẩu', 'password')}
+                        {renderInput('uConfirmPassword', 'Xác nhận mật khẩu', 'password')}
                         <button
                             type="submit"
                             disabled={loading}

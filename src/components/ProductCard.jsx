@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
-const ProductCard = ({ prId, prTitle, prAuthor, prImage, prPrice, prStockQuantity }) => {
+const ProductCard = ({ prId, prTitle, prAuthor, prImage, prPrice }) => {
     const formatPrice = (price) => {
         const numberPrice = Number(price);
         if (!isNaN(numberPrice)) {
@@ -14,10 +14,10 @@ const ProductCard = ({ prId, prTitle, prAuthor, prImage, prPrice, prStockQuantit
 
     return (
         <Link
-            to={`/product/${prId}`}
+            to={`/productdetail/${prId}`}
             className="block bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden"
         >
-            <div className="relative w-full h-48 overflow-hidden bg-gray-100">
+            <div className="relative w-full h-48 sm:h-56 md:h-64 overflow-hidden bg-gray-100">
                 <img
                     src={prImage || '/placeholder-image.png'}
                     alt={prTitle}
@@ -26,10 +26,11 @@ const ProductCard = ({ prId, prTitle, prAuthor, prImage, prPrice, prStockQuantit
                 />
             </div>
             <div className="p-4">
-                <h3 className="text-sm font-semibold text-gray-800">{prTitle}</h3>
-                <p className="text-xs text-gray-500 mt-1">{prAuthor}</p>
-                <p className="text-lg font-bold text-blue-600 mt-2">{formatPrice(prPrice)}</p>
-                <p className="text-xs text-gray-500 mt-1">Số lượng: {prStockQuantity}</p>
+                <h3 className="text-base font-semibold text-gray-800 whitespace-nowrap overflow-hidden overflow-ellipsis" style={{ lineHeight: '1.5' }}>
+                    {prTitle}
+                </h3>
+                <p className="text-sm text-gray-500 mt-1" style={{ lineHeight: '1.5' }}>{prAuthor}</p>
+                <p className="text-lg font-bold text-blue-600 mt-2" style={{ lineHeight: '1.5' }}>{formatPrice(prPrice)}</p>
             </div>
         </Link>
     );
@@ -41,7 +42,6 @@ ProductCard.propTypes = {
     prAuthor: PropTypes.string,
     prImage: PropTypes.string,
     prPrice: PropTypes.string.isRequired,
-    prStockQuantity: PropTypes.string.isRequired,
 };
 
 export default ProductCard;

@@ -1,15 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import userApi from '../api/userApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../redux/slices/userSlice';
 
 const Login = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { loading, error, users } = useSelector(state => state.user);
     const [formData, setFormData] = useState({
         uEmail: '',
         uPassword: ''
     });
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+
+    useEffect(() => {
+        if (users.length > 0 && users[0] && users[0].uRole) {
+            const userRole = users[0].uRole;
+            setSuccessMessage('Đăng nhập thành công!');
+            setTimeout(() => {
+                if (userRole === 'ADMIN') {
+                    navigate('/dashboard');
+                } else {
+                    navigate('/');
+                }
+            }, 1500);
+        }
+    }, [users, navigate]);
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -21,63 +37,27 @@ const Login = () => {
 
     const validateForm = () => {
         if (!formData.uEmail.trim()) {
-            setError('Vui lòng nhập email');
             return false;
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formData.uEmail)) {
-            setError('Email không hợp lệ');
             return false;
         }
         if (!formData.uPassword) {
-            setError('Vui lòng nhập mật khẩu');
             return false;
         }
         return true;
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         if (!validateForm()) return;
-
-        setLoading(true);
-        setError('');
-        try {
-            const response = await userApi.loginUser({
-                uEmail: formData.uEmail.trim().toLowerCase(),
-                uPassword: formData.uPassword
-            });
-
-            if (response.status === 'OK') {
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('user', JSON.stringify(response.data.user));
-
-                alert('Đăng nhập thành công!');
-
-                setTimeout(() => {
-                    const userRole = response.data.user.uRole;
-                    if (userRole === 'ADMIN') {
-                        navigate('/dashboard');
-                    } else {
-                        navigate('/');
-                    }
-                }, 1500);
-            } else {
-                throw new Error(response.message || 'Đăng nhập thất bại');
-            }
-        } catch (error) {
-            const errorMessage = error.response?.data?.message || error.message || 'Đăng nhập thất bại';
-            setError(errorMessage);
-        } finally {
-            setLoading(false);
-        }
+        dispatch(loginUser(formData));
     };
 
     const renderInput = (id, label, type = 'text') => (
         <div className="mb-4">
-            <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
-                {label}
-            </label>
+            <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
             <input
                 type={type}
                 id={id}
@@ -98,6 +78,7 @@ const Login = () => {
 
                 <div className="bg-white p-8 rounded-lg shadow-md">
                     {error && <div className="text-red-500 mb-4">{error}</div>}
+                    {successMessage && <div className="text-green-500 mb-4">{successMessage}</div>}
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {renderInput('uEmail', 'Email', 'email')}
                         {renderInput('uPassword', 'Mật khẩu', 'password')}

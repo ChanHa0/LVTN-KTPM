@@ -11,7 +11,7 @@ const Profile = () => {
         uEmail: '',
         uPhone: '',
         uAddress: '',
-        uAge: ''
+        uRole: ''
     });
 
     useEffect(() => {
@@ -32,7 +32,7 @@ const Profile = () => {
                         uEmail: userData.uEmail || '',
                         uPhone: userData.uPhone || '',
                         uAddress: userData.uAddress || '',
-                        uAge: userData.uAge || ''
+                        uRole: userData.uRole || ''
                     });
                 } else {
                     toast.error('Không thể lấy thông tin người dùng');
@@ -102,8 +102,8 @@ const Profile = () => {
                                         <p className="font-semibold">{user?.uPhone || 'Chưa cập nhật'}</p>
                                     </div>
                                     <div className="mb-4">
-                                        <p className="text-sm text-gray-600">Tuổi</p>
-                                        <p className="font-semibold">{user?.uAge || 'Chưa cập nhật'}</p>
+                                        <p className="text-sm text-gray-600">Vai trò</p>
+                                        <p className="font-semibold">{user?.uRole || 'USER'}</p>
                                     </div>
                                     <div className="col-span-2">
                                         <p className="text-sm text-gray-600">Địa chỉ</p>
@@ -161,13 +161,14 @@ const Profile = () => {
                             </div>
                             <div className="mb-4">
                                 <label className="block text-gray-700 text-sm font-bold mb-2">
-                                    Tuổi
+                                    Vai trò
                                     <input
-                                        type="number"
-                                        name="uAge"
-                                        value={formData.uAge}
+                                        type="text"
+                                        name="uRole"
+                                        value={formData.uRole}
                                         onChange={handleChange}
                                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                                        disabled
                                     />
                                 </label>
                             </div>

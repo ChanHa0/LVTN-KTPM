@@ -4,6 +4,7 @@ import { FaPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../components/LoadingSpinner';
 import userApi from '../api/userApi';
+import InputField from '../components/InputField';
 
 const ManageUsers = () => {
     const [users, setUsers] = useState([]);
@@ -174,17 +175,18 @@ const ManageUsers = () => {
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tên</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Số điện thoại</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vai trò</th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Thao tác</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase w-2/12">Tên</th>
+                                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase w-2/12">Email</th>
+                                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase w-2/12">Số điện thoại</th>
+                                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase w-2/12">Địa chỉ</th>
+                                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase w-2/12">Vai trò</th>
+                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase w-2/12">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {filteredUsers.length === 0 ? (
                                         <tr>
-                                            <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                                            <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
                                                 Không có người dùng nào
                                             </td>
                                         </tr>
@@ -192,15 +194,24 @@ const ManageUsers = () => {
                                         filteredUsers.map((user) => (
                                             <tr key={user._id} className="hover:bg-gray-100 transition duration-150 ease-in-out">
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.uName}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.uEmail}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.uPhone}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.uRole}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
-                                                    <button onClick={() => handleEdit(user)} className="text-indigo-600 hover:text-indigo-900 transition duration-150 ease-in-out" title="Chỉnh sửa">
-                                                        <FaEdit className="inline-block w-5 h-5" />
+                                                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">{user.uEmail}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">{user.uPhone}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">{user.uAddress}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">{user.uRole}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
+                                                    <button
+                                                        onClick={() => handleEdit(user)}
+                                                        className="text-indigo-600 hover:text-indigo-900 transition duration-150 ease-in-out"
+                                                        title="Sửa"
+                                                    >
+                                                        <FaEdit className="inline-block w-4 h-4" />
                                                     </button>
-                                                    <button onClick={() => handleDelete(user._id)} className="text-red-600 hover:text-red-900 transition duration-150 ease-in-out" title="Xóa">
-                                                        <FaTrash className="inline-block w-5 h-5" />
+                                                    <button
+                                                        onClick={() => handleDelete(user._id)}
+                                                        className="text-red-600 hover:text-red-900 transition duration-150 ease-in-out"
+                                                        title="Xóa"
+                                                    >
+                                                        <FaTrash className="inline-block w-4 h-4" />
                                                     </button>
                                                 </td>
                                             </tr>
@@ -211,8 +222,6 @@ const ManageUsers = () => {
                         </div>
                     )}
                 </div>
-
-                {/* Form Modal */}
                 {showForm && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                         <div className="bg-white rounded-lg w-full max-w-2xl">
@@ -222,61 +231,44 @@ const ManageUsers = () => {
                                 </h2>
                                 <form onSubmit={handleSubmit} className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Họ tên</label>
-                                            <input
-                                                type="text"
-                                                name="uName"
-                                                value={formData.uName}
-                                                onChange={handleInputChange}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Email</label>
-                                            <input
-                                                type="email"
-                                                name="uEmail"
-                                                value={formData.uEmail}
-                                                onChange={handleInputChange}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Mật khẩu</label>
-                                            <input
-                                                type="password"
+                                        <InputField
+                                            label="Họ tên"
+                                            name="uName"
+                                            value={formData.uName}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                        <InputField
+                                            label="Email"
+                                            name="uEmail"
+                                            value={formData.uEmail}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                        {!editingUser && (
+                                            <InputField
+                                                label="Mật khẩu"
                                                 name="uPassword"
+                                                type="password"
                                                 value={formData.uPassword}
                                                 onChange={handleInputChange}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                                required={!editingUser}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Số điện thoại</label>
-                                            <input
-                                                type="text"
-                                                name="uPhone"
-                                                value={formData.uPhone}
-                                                onChange={handleInputChange}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                                 required
                                             />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Địa chỉ</label>
-                                            <input
-                                                type="text"
-                                                name="uAddress"
-                                                value={formData.uAddress}
-                                                onChange={handleInputChange}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                                required
-                                            />
-                                        </div>
+                                        )}
+                                        <InputField
+                                            label="Số điện thoại"
+                                            name="uPhone"
+                                            value={formData.uPhone}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                        <InputField
+                                            label="Địa chỉ"
+                                            name="uAddress"
+                                            value={formData.uAddress}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700">Vai trò</label>
                                             <select
@@ -299,16 +291,15 @@ const ManageUsers = () => {
                                                 setShowForm(false);
                                                 resetForm();
                                             }}
-                                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                                            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
                                         >
                                             Hủy
                                         </button>
                                         <button
                                             type="submit"
-                                            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
-                                            disabled={loading}
+                                            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
                                         >
-                                            {loading ? 'Đang xử lý...' : (editingUser ? 'Cập nhật' : 'Thêm mới')}
+                                            {editingUser ? 'Cập nhật' : 'Thêm mới'}
                                         </button>
                                     </div>
                                 </form>

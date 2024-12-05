@@ -10,7 +10,7 @@ const ManageOrders = () => {
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [showDetail, setShowDetail] = useState(false);
-    const [selectedOrder, setSelectedOrder] = useState(null);
+    const [orderDetails, setOrderDetails] = useState(null);
 
     useEffect(() => {
         fetchOrders();
@@ -24,9 +24,9 @@ const ManageOrders = () => {
                 const formattedOrders = response.data.map(order => ({
                     _id: order._id,
                     uId: order.uId,
-                    oOrderDate: order.oOrderDate || order.createdAt,
-                    oTotalAmount: order.oTotalAmount,
-                    status: order.oStatus || 'PENDING',
+                    oOrderDate: order.createdAt,
+                    oTotalAmount: order.oTotalPrice,
+                    status: order.oStatus,
                     oShippingAddress: order.oShippingAddress,
                     oShippingMethod: order.oShippingMethod
                 }));
@@ -88,7 +88,7 @@ const ManageOrders = () => {
                 if (response.status === 'OK') {
                     toast.success('Hủy đơn hàng thành công');
                     setOrders(prevOrders => prevOrders.map(order =>
-                        order._id === id ? { ...order, status: 'canceled' } : order
+                        order._id === id ? { ...order, status: 'CANCELLED' } : order
                     ));
                 } else {
                     toast.error(response.message);
@@ -98,6 +98,24 @@ const ManageOrders = () => {
             } finally {
                 setLoading(false);
             }
+        }
+    };
+
+    const fetchOrderDetails = async (id) => {
+        try {
+            setLoading(true);
+            const response = await orderApi.getDetailOrder(id);
+            if (response.status === 'OK') {
+                setOrderDetails(response.data);
+                setShowDetail(true);
+            } else {
+                toast.error('Lỗi khi tải chi tiết đơn hàng');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            toast.error('Không thể kết nối đến server');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -136,8 +154,6 @@ const ManageOrders = () => {
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mã đơn</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Khách hàng</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Địa chỉ</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phương thức</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ngày đặt</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tổng tiền</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
@@ -147,7 +163,7 @@ const ManageOrders = () => {
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {filteredOrders.length === 0 ? (
                                         <tr>
-                                            <td colSpan="8" className="px-6 py-4 text-center text-gray-500">
+                                            <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
                                                 Không có đơn hàng nào
                                             </td>
                                         </tr>
@@ -163,12 +179,6 @@ const ManageOrders = () => {
                                                     {order.uId}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {order.oShippingAddress}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {order.oShippingMethod}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                     {new Date(order.oOrderDate).toLocaleDateString('vi-VN')}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -180,25 +190,32 @@ const ManageOrders = () => {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                                                     <button
+                                                        onClick={() => fetchOrderDetails(order._id)}
+                                                        className="text-blue-600 hover:text-blue-900"
+                                                        title="Xem chi tiết"
+                                                    >
+                                                        <FaEye className="inline-block w-4 h-4" />
+                                                    </button>
+                                                    <button
                                                         onClick={() => handleConfirm(order._id)}
                                                         className="text-green-600 hover:text-green-900"
                                                         title="Xác nhận"
                                                     >
-                                                        <FaCheck className="inline-block w-5 h-5" />
+                                                        <FaCheck className="inline-block w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleCancel(order._id)}
                                                         className="text-yellow-600 hover:text-yellow-900"
                                                         title="Hủy"
                                                     >
-                                                        <FaBan className="inline-block w-5 h-5" />
+                                                        <FaBan className="inline-block w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(order._id)}
                                                         className="text-red-600 hover:text-red-900"
                                                         title="Xóa"
                                                     >
-                                                        <FaTrash className="inline-block w-5 h-5" />
+                                                        <FaTrash className="inline-block w-4 h-4" />
                                                     </button>
                                                 </td>
                                             </tr>
@@ -209,6 +226,34 @@ const ManageOrders = () => {
                         </div>
                     )}
                 </div>
+                {showDetail && orderDetails && (
+                    <div className="mt-6 bg-white shadow-md rounded-lg p-6">
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">Chi tiết đơn hàng</h2>
+                        <p><strong>Mã đơn hàng:</strong> {orderDetails._id}</p>
+                        <p><strong>Khách hàng:</strong> {orderDetails.uId}</p>
+                        <p><strong>Địa chỉ giao hàng:</strong> {orderDetails.oShippingAddress}</p>
+                        <p><strong>Phương thức giao hàng:</strong> {orderDetails.oShippingMethod}</p>
+                        <p><strong>Phương thức thanh toán:</strong> {orderDetails.oPaymentMethod}</p>
+                        <p><strong>Tổng tiền:</strong> {orderDetails.oTotalPrice.toLocaleString('vi-VN')}₫</p>
+                        <p><strong>Trạng thái:</strong> {orderDetails.oStatus}</p>
+                        <h3 className="text-lg font-semibold text-gray-800 mt-4">Sản phẩm:</h3>
+                        <ul className="list-disc pl-5">
+                            {orderDetails.oItems.map(item => (
+                                <li key={item.prId}>
+                                    <p><strong>Sản phẩm ID:</strong> {item.prId}</p>
+                                    <p><strong>Số lượng:</strong> {item.prQuantity}</p>
+                                    <p><strong>Giá:</strong> {item.prPrice.toLocaleString('vi-VN')}₫</p>
+                                </li>
+                            ))}
+                        </ul>
+                        <button
+                            onClick={() => setShowDetail(false)}
+                            className="mt-4 text-blue-600 hover:text-blue-900"
+                        >
+                            Đóng
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -56,14 +56,32 @@ const productApi = {
         }
     },
 
-    getStatisticsProduct: async () => {
+    createProductReview: async (prId, reviewData) => {
         try {
-            const response = await axiosClient.get('api/product/statistics');
+            const response = await axiosClient.post(`api/product/review/${prId}`, reviewData);
             return response;
         } catch (error) {
             throw error;
         }
     },
+
+    getRatingProduct: async (id) => {
+        try {
+            const response = await axiosClient.get(`api/product/rating/${id}`);
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    getCommentProduct: async (id) => {
+        try {
+            const response = await axiosClient.get(`api/product/comment/${id}`);
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
 };
 
 export default productApi;

@@ -1,84 +1,79 @@
-import React, { useState, useEffect } from 'react';
-import { FaBook, FaShoppingCart, FaDollarSign, FaArrowUp, FaArrowDown } from 'react-icons/fa';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import AdminNavbar from '../components/AdminNavbar';
-import productApi from '../api/productApi';
+import statisticApi from '../api/statisticApi';
+import { setStatistics } from '../redux/slices/statisticSlice';
+import { Line } from 'react-chartjs-2';
+import 'chart.js/auto';
 
 const Dashboard = () => {
-    const [stats, setStats] = useState([]);
+    const dispatch = useDispatch();
+    const stats = useSelector((state) => state.statistic.data);
 
     useEffect(() => {
         const fetchStatistics = async () => {
             try {
-                const response = await productApi.getStatisticsProduct();
-                if (response.status === 'OK') {
-                    const statistics = response.data;
+                const totalRevenue = await statisticApi.getTotalRevenue();
+                const totalOrders = await statisticApi.getTotalOrder();
+                const totalProductsSold = await statisticApi.getTotalProductSold();
+                const totalInventory = await statisticApi.getProductInventory();
 
-                    setStats([
-                        {
-                            title: 'Tổng doanh thu',
-                            value: `${statistics.totalRevenue}đ`,
-                            icon: <FaDollarSign className="text-blue-500" />,
-                            change: '+12.5%', // Cập nhật theo dữ liệu thực tế
-                            isIncrease: true
-                        },
-                        {
-                            title: 'Tổng số đơn hàng',
-                            value: statistics.totalOrders,
-                            icon: <FaShoppingCart className="text-green-500" />,
-                            change: '+8.2%', // Cập nhật theo dữ liệu thực tế
-                            isIncrease: true
-                        },
-                        {
-                            title: 'Sản phẩm đã bán',
-                            value: statistics.totalProductsSold,
-                            icon: <FaBook className="text-purple-500" />,
-                            change: '+10.0%', // Cập nhật theo dữ liệu thực tế
-                            isIncrease: true
-                        },
-                        {
-                            title: 'Sản phẩm còn trong kho',
-                            value: statistics.totalInventory,
-                            icon: <FaBook className="text-red-500" />,
-                            change: '-5.0%', // Cập nhật theo dữ liệu thực tế
-                            isIncrease: false
-                        },
-                    ]);
-                } else {
-                    console.error('Error fetching statistics:', response.message);
-                }
+                dispatch(setStatistics({
+                    totalRevenue: totalRevenue.data,
+                    totalOrders: totalOrders.data,
+                    totalProductsSold: totalProductsSold.data,
+                    totalInventory: totalInventory.data
+                }));
             } catch (error) {
-                console.error('Error fetching statistics:', error);
+                console.error('Failed to fetch statistics:', error);
             }
         };
 
         fetchStatistics();
-    }, []);
+    }, [dispatch]);
+
+    const revenueData = {
+        labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
+        datasets: [
+            {
+                label: 'Doanh thu',
+                data: [12000000, 15000000, 13000000, 17000000, 16000000, 18000000], // Thay thế bằng dữ liệu thực tế
+                fill: false,
+                backgroundColor: 'rgb(75, 192, 192)',
+                borderColor: 'rgba(75, 192, 192, 0.2)',
+            },
+        ],
+    };
 
     return (
         <div className="min-h-screen bg-gray-50">
             <AdminNavbar />
 
             <div className="max-w-7xl mx-auto px-4 py-8">
-                <h1 className="text-2xl font-bold text-gray-800 mb-6">Tổng quan</h1>
+                <h1 className="text-2xl font-bold text-gray-800 mb-6">Thống kê</h1>
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    {stats.map((stat, index) => (
-                        <div key={index} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="p-3 bg-gray-50 rounded-lg">
-                                    {stat.icon}
-                                </div>
-                                <div className={`flex items-center ${stat.isIncrease ? 'text-green-500' : 'text-red-500'
-                                    }`}>
-                                    {stat.isIncrease ? <FaArrowUp size={12} /> : <FaArrowDown size={12} />}
-                                    <span className="ml-1 text-sm">{stat.change}</span>
-                                </div>
+                    {stats && (
+                        <>
+                            <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+                                <h3 className="text-gray-500 text-sm mb-1">Doanh thu</h3>
+                                <p className="text-2xl font-semibold text-gray-800">{stats.totalRevenue ?? 0}</p>
                             </div>
-                            <h3 className="text-gray-500 text-sm mb-1">{stat.title}</h3>
-                            <p className="text-2xl font-semibold text-gray-800">{stat.value}</p>
-                        </div>
-                    ))}
+                            <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+                                <h3 className="text-gray-500 text-sm mb-1">Đơn hàng</h3>
+                                <p className="text-2xl font-semibold text-gray-800">{stats.totalOrders ?? 0}</p>
+                            </div>
+                            <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+                                <h3 className="text-gray-500 text-sm mb-1">Sản phẩm đã bán</h3>
+                                <p className="text-2xl font-semibold text-gray-800">{stats.totalProductsSold ?? 0}</p>
+                            </div>
+                            <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+                                <h3 className="text-gray-500 text-sm mb-1">Tồn kho</h3>
+                                <p className="text-2xl font-semibold text-gray-800">{stats.totalInventory ?? 0}</p>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -88,7 +83,7 @@ const Dashboard = () => {
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
                         Doanh thu theo tháng
                     </h3>
-                    {/* <RevenueChart /> */}
+                    <Line data={revenueData} />
                 </div>
                 <div className="bg-white rounded-lg shadow-sm p-6">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
@@ -97,7 +92,7 @@ const Dashboard = () => {
                     {/* <TopSellingBooks /> */}
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 

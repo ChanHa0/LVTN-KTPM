@@ -6,7 +6,6 @@ const userApi = {
             const response = await axiosClient.post('api/user/register', userData);
             return response;
         } catch (error) {
-            console.error('Error creating user:', error);
             throw error;
         }
     },
@@ -16,7 +15,6 @@ const userApi = {
             const response = await axiosClient.post('api/user/login', credentials);
             return response;
         } catch (error) {
-            console.error('Error logging in user:', error);
             throw error;
         }
     },
@@ -26,7 +24,6 @@ const userApi = {
             const response = await axiosClient.put(`api/user/${id}`, userData);
             return response;
         } catch (error) {
-            console.error('Error updating user:', error);
             throw error;
         }
     },
@@ -36,7 +33,6 @@ const userApi = {
             const response = await axiosClient.delete(`api/user/${id}`);
             return response;
         } catch (error) {
-            console.error('Error deleting user:', error);
             throw error;
         }
     },
@@ -46,7 +42,6 @@ const userApi = {
             const response = await axiosClient.get('api/user/all');
             return response;
         } catch (error) {
-            console.error('Error fetching users:', error);
             throw error;
         }
     },
@@ -56,7 +51,6 @@ const userApi = {
             const response = await axiosClient.get(`api/user/${id}`);
             return response;
         } catch (error) {
-            console.error('Error fetching user details:', error);
             throw error;
         }
     },

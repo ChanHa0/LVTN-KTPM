@@ -4,7 +4,6 @@ import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import ProductDetail from "./pages/ProductDetail";
 import Product from "./pages/Product";
-import MyOrders from "./pages/MyOrders";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
@@ -14,6 +13,7 @@ import Dashboard from './pages/Dashboard';
 import ManageProducts from './pages/ManageProducts';
 import ManageUsers from "./pages/ManageUsers";
 import ManageOrders from './pages/ManageOrders';
+import MyOrders from './pages/MyOrders';
 
 export const routes = [
     {
@@ -29,7 +29,7 @@ export const routes = [
         element: <AuthLayout><Login /></AuthLayout>
     },
     {
-        path: '/user/:id',
+        path: '/profile',
         element: <MainLayout><Profile /></MainLayout>
     },
     {
@@ -37,7 +37,7 @@ export const routes = [
         element: <MainLayout><Product /></MainLayout>
     },
     {
-        path: '/product/:id',
+        path: '/productdetail/:id',
         element: <MainLayout><ProductDetail /></MainLayout>
     },
     {
@@ -45,17 +45,14 @@ export const routes = [
         element: <MainLayout><Cart /></MainLayout>
     },
     {
-        path: '/my-orders',
+        path: '/myorders',
         element: <MainLayout><MyOrders /></MainLayout>
     },
     {
         path: '/checkout',
         element: <MainLayout><Checkout /></MainLayout>
     },
-    {
-        path: '*',
-        element: <NotFound />
-    },
+
     {
         path: '/dashboard',
         element: <MainLayout><Dashboard /></MainLayout>
@@ -71,5 +68,9 @@ export const routes = [
     {
         path: '/manage-order',
         element: <MainLayout><ManageOrders /></MainLayout>
+    },
+    {
+        path: '*',
+        element: <NotFound />
     },
 ];
