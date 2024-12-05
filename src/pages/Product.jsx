@@ -3,7 +3,7 @@ import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import productApi from '../api/productApi';
 
-const ProductList = () => {
+const Product = () => {
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -11,6 +11,7 @@ const ProductList = () => {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 8;
+    const [selectedCategory, setSelectedCategory] = useState('');
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -43,6 +44,22 @@ const ProductList = () => {
         setCurrentPage(1);
     };
 
+    const handleCategoryChange = (event) => {
+        const category = event.target.value;
+        setSelectedCategory(category);
+
+        const filtered = products.filter((product) => {
+            const matchesSearchTerm =
+                product.prTitle.toLowerCase().includes(searchTerm) ||
+                product.prAuthor?.toLowerCase().includes(searchTerm);
+            const matchesCategory = category === '' || product.prCategory === category;
+            return matchesSearchTerm && matchesCategory;
+        });
+
+        setFilteredProducts(filtered);
+        setCurrentPage(1);
+    };
+
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
@@ -62,7 +79,7 @@ const ProductList = () => {
                     </p>
                 </div>
 
-                <div className="mb-8">
+                <div className="mb-8 flex space-x-4">
                     <input
                         type="text"
                         placeholder="Tìm kiếm sản phẩm..."
@@ -70,6 +87,20 @@ const ProductList = () => {
                         onChange={handleSearch}
                         className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+                    <select
+                        value={selectedCategory}
+                        onChange={handleCategoryChange}
+                        className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        <option value="">Tất cả loại</option>
+                        <option value="Sách văn học">Sách văn học</option>
+                        <option value="Sách khoa học">Sách khoa học</option>
+                        <option value="Sách kinh tế">Sách kinh tế</option>
+                        <option value="Tiểu thuyết">Tiểu thuyết</option>
+                        <option value="Truyện tranh">Truyện tranh</option>
+                        <option value="Sách ngoại ngữ">Sách ngoại ngữ</option>
+                        <option value="Sách thiếu nhi">Sách thiếu nhi</option>
+                    </select>
                 </div>
 
                 {currentProducts.length === 0 ? (
@@ -111,4 +142,4 @@ const ProductList = () => {
     );
 };
 
-export default ProductList;
+export default Product;

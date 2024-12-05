@@ -3,12 +3,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { toast } from 'react-toastify';
 import cartApi from '../api/cartApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { increaseItemQuantity, decreaseItemQuantity, increaseQuantity, decreaseQuantity } from '../redux/slices/cartSlice';
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
+    const dispatch = useDispatch();
+    const { items } = useSelector((state) => state.cart);
 
     useEffect(() => {
         if (!user?._id) {
@@ -87,6 +91,20 @@ const Cart = () => {
         localStorage.removeItem(`cart_${user._id}`);
     };
 
+    const handleIncrease = (prId) => {
+        if (user && user._id) {
+            dispatch(increaseItemQuantity({ prId }));
+            dispatch(increaseQuantity({ uId: user._id, prId }));
+        }
+    };
+
+    const handleDecrease = (prId) => {
+        if (user && user._id) {
+            dispatch(decreaseItemQuantity({ prId }));
+            dispatch(decreaseQuantity({ uId: user._id, prId }));
+        }
+    };
+
     const CartItem = ({ item }) => (
         <div className="flex items-center gap-4 bg-white p-4 rounded-lg shadow mb-4">
             <img
@@ -99,7 +117,7 @@ const Cart = () => {
                 <p className="text-gray-600">{item.prId.prPrice.toLocaleString()}đ</p>
                 <div className="flex items-center mt-2">
                     <button
-                        onClick={() => handleUpdateQuantity(item.prId._id, item.prQuantity - 1)}
+                        onClick={() => handleDecrease(item.prId._id)}
                         disabled={item.prQuantity <= 1}
                         className="px-2 py-1 bg-gray-200 rounded disabled:opacity-50"
                     >
@@ -107,7 +125,7 @@ const Cart = () => {
                     </button>
                     <span className="mx-2">{item.prQuantity}</span>
                     <button
-                        onClick={() => handleUpdateQuantity(item.prId._id, item.prQuantity + 1)}
+                        onClick={() => handleIncrease(item.prId._id)}
                         className="px-2 py-1 bg-gray-200 rounded"
                     >
                         +

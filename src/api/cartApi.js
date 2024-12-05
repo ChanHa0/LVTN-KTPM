@@ -7,7 +7,7 @@ const cartApi = {
                 uId,
                 products
             });
-            return response;
+            return response.data;
         } catch (error) {
             throw error;
         }
@@ -18,7 +18,7 @@ const cartApi = {
             const response = await axiosClient.put(`api/cart/${uId}/${prId}`, {
                 prQuantity
             });
-            return response;
+            return response.data;
         } catch (error) {
             throw error;
         }
@@ -27,7 +27,7 @@ const cartApi = {
     removeFromCart: async (uId, prId) => {
         try {
             const response = await axiosClient.delete(`api/cart/${uId}/${prId}`);
-            return response;
+            return response.data;
         } catch (error) {
             throw error;
         }

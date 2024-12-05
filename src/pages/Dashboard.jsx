@@ -19,10 +19,10 @@ const Dashboard = () => {
                 const totalInventory = await statisticApi.getProductInventory();
 
                 dispatch(setStatistics({
-                    totalRevenue: totalRevenue.data,
-                    totalOrders: totalOrders.data,
-                    totalProductsSold: totalProductsSold.data,
-                    totalInventory: totalInventory.data
+                    totalRevenue: totalRevenue?.data || 0,
+                    totalOrders: totalOrders?.data || 0,
+                    totalProductsSold: totalProductsSold?.data || 0,
+                    totalInventory: totalInventory?.data || 0
                 }));
             } catch (error) {
                 console.error('Failed to fetch statistics:', error);
